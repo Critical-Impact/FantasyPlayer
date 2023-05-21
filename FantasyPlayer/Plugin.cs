@@ -1,5 +1,8 @@
 ﻿using System;
 using Dalamud.Game.Command;
+using Dalamud.Game.Gui;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
@@ -62,6 +65,37 @@ namespace FantasyPlayer
         {
             if (!Configuration.DisplayChatMessages)
                 return;
+
+            Service.ChatGui.Print(message);
+        }
+
+        public void DisplaySongTitle(string songTitle)
+        {
+            if (!Configuration.DisplayChatMessages)
+                return;
+
+            var message = PluginInterface.UiLanguage switch
+            {
+                "ja" => new SeString(new Payload[]
+                    {
+                        new TextPayload($"「{songTitle}」を再生しました。"), // 「Weight of the World／Prelude Version」を再生しました。
+                    }),
+                "de" => new SeString(new Payload[]
+                    {
+                        new TextPayload($"„{songTitle}“ wird nun wiedergegeben."), // „Weight of the World (Prelude Version)“ wird nun wiedergegeben.
+                    }),
+                "fr" => new SeString(new Payload[]
+                    {
+                        new TextPayload($"Le FantasyPlayer lit désormais “{songTitle}”."), // L'orchestrion joue désormais “Weight of the World (Prelude Version)”.
+                    }),
+                _ => new SeString(new Payload[]
+                    {
+                        new EmphasisItalicPayload(true),
+                        new TextPayload(songTitle), // _Weight of the World (Prelude Version)_ is now playing.
+                        new EmphasisItalicPayload(false),
+                        new TextPayload(" is now playing."),
+                    }),
+            };
 
             Service.ChatGui.Print(message);
         }

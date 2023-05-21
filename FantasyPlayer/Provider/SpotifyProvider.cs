@@ -42,7 +42,7 @@ namespace FantasyPlayer.Provider
         private void OnPlayerStateUpdate(CurrentlyPlayingContext currentlyPlaying, FullTrack playbackItem)
         {
             if (playbackItem.Id != _lastId)
-                _plugin.DisplayMessage($"Playing '{playbackItem.Name}'...");
+                _plugin.DisplaySongTitle(playbackItem.Name);
             _lastId = playbackItem.Id;
 
 
