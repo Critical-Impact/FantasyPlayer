@@ -57,7 +57,7 @@ namespace FantasyPlayer
 
         private void OnCommand(string command, string arguments)
         {
-            Service.CommandManager.ProcessCommand(arguments);
+            CommandManager.ParseCommand(arguments);
         }
 
         public void DisplayMessage(string message)
