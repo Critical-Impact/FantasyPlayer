@@ -126,6 +126,7 @@ namespace FantasyPlayer.Provider
 
             _spotifyState.OnLoggedIn -= OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate -= OnPlayerStateUpdate;
+            _spotifyState.Dispose();
         }
 
         public void StartAuth()

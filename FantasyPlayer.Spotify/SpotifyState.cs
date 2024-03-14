@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using SpotifyAPI.Web;
@@ -129,16 +130,16 @@ namespace FantasyPlayer.Spotify
 
         private async Task StateUpdateTimer(object obj)
         {
-            while (true)
+            CancellationToken token = (CancellationToken)obj;
+            while (!token.IsCancellationRequested)
             {
-                CancellationToken token = (CancellationToken)obj;
+                await CheckPlayerState(token);
+
+                await Task.Delay(_playerRefreshTime, token);
                 if (token.IsCancellationRequested)
                 {
                     break;
                 }
-                var delayTask = Task.Delay(_playerRefreshTime); //Run timer every _playerRefreshTime
-                await CheckPlayerState();
-                await delayTask;
             }
         }
 
@@ -156,11 +157,11 @@ namespace FantasyPlayer.Spotify
             OnPlayerStateUpdate?.Invoke(playback, playbackItem);
         }
 
-        private async Task CheckPlayerState()
+        private async Task CheckPlayerState(CancellationToken token)
         {
             try
             {
-                var playback = await _spotifyClient.Player.GetCurrentPlayback();
+                var playback = await _spotifyClient.Player.GetCurrentPlayback(token);
 
                 if (playback.Item.Type != ItemType.Track)
                     return; //TODO: Set invalid state
@@ -217,13 +218,21 @@ namespace FantasyPlayer.Spotify
 
             CreateLoginRequest();
             var uri = _loginRequest.ToUri();
-            BrowserUtil.Open(uri);
+            _ = Process.Start(new ProcessStartInfo()
+            {
+                FileName = uri.ToString(),
+                UseShellExecute = true,
+            });
         }
 
         public void RetryLogin()
         {
             var uri = _loginRequest.ToUri();
-            BrowserUtil.Open(uri);
+            _ = Process.Start(new ProcessStartInfo()
+            {
+                FileName = uri.ToString(),
+                UseShellExecute = true,
+            });
         }
 
         public void PauseOrPlay(bool play)
@@ -312,6 +321,7 @@ namespace FantasyPlayer.Spotify
             _stateUpdateCts.Cancel();
             _stateUpdateCts.Dispose();
             _server?.Stop();
+            _spotifyClient = null;
         }
     }
 }
