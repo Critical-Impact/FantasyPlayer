@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0-windows</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -45,18 +45,19 @@
             <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
             <Private>True</Private>
         </Reference>
-        <Reference Include="StbiSharp">
-            <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\StbiSharp.dll</HintPath>
+        <Reference Include="StbiSharp" PrivateAssets="All">
+            <HintPath>$(DalamudLibPath)StbiSharp.dll</HintPath>
+            <Private>True</Private>
         </Reference>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DalaMock\DalaMock.Mock\DalaMock.Mock.csproj" />
         <ProjectReference Include="..\FantasyPlayer\FantasyPlayer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dalamud.ContextMenu" Version="1.2.3" />
+        <PackageReference Include="DalaMock.Core" Version="2.0.5" />
+        <PackageReference Include="DalaMock.Shared" Version="2.0.5" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
         <PackageReference Include="StbiSharp" Version="1.2.1" />
         <PackageReference Include="Veldrid" Version="4.9.0" />

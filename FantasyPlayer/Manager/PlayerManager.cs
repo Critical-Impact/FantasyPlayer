@@ -13,83 +13,88 @@ using FantasyPlayer.Provider.Common;
 
 namespace FantasyPlayer.Manager
 {
-    public class PlayerManager
+    using System.Threading;
+    using Config;
+    using Dalamud.Plugin.Services;
+    using Microsoft.Extensions.Hosting;
+
+    public class PlayerManager : BackgroundService
     {
-        private readonly IPlugin _plugin;
-        public Dictionary<Type, IPlayerProvider> PlayerProviders;
+        private readonly IPluginLog pluginLog;
+        private readonly Configuration configuration;
+        private readonly IFramework framework;
 
-        public IPlayerProvider CurrentPlayerProvider;
-        public bool ProvidersLoading = false;
+        public IPlayerProvider? CurrentPlayerProvider;
 
-        public PlayerManager(IPlugin plugin)
+        public bool ProvidersLoading
         {
-            _plugin = plugin;
-            ResetProviders();
-            InitializeProviders();
-        }
-
-        public void ReloadProviders()
-        {
-            DisposeProviders();
-            ResetProviders();
-            InitializeProviders();
-        }
-
-        private void ResetProviders()
-        {
-            CurrentPlayerProvider = default;
-            PlayerProviders = new Dictionary<Type, IPlayerProvider>();
-        }
-
-        private void InitializeProviders()
-        {
-            ProvidersLoading = true;
-            var ppType = typeof(IPlayerProvider);
-            var interfaces = Assembly.GetExecutingAssembly().GetLoadableTypes().Where(c => ppType.IsAssignableFrom(c) && c.IsClass && !c.IsAbstract).ToList();
-
-            List<Task<IPlayerProvider>> providerTasks = new List<Task<IPlayerProvider>>();
-            foreach (var playerProvider in interfaces)
+            get
             {
-                PluginLog.Log("Found provider: " + playerProvider.FullName);
-                providerTasks.Add(InitializeProvider(playerProvider,  new SpotifyProvider()));
+                return PlayerProviders.Any(c => !c.Initialized);
             }
+        }
 
-            Task.WhenAll(providerTasks).ContinueWith(task =>
+        public List<IPlayerProvider> PlayerProviders { get; }
+
+        public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, IFramework framework)
+        {
+            this.pluginLog = pluginLog;
+            this.configuration = configuration;
+            this.PlayerProviders = playerProviders.ToList();
+            this.framework = framework;
+            SetupDefaultProvider();
+        }
+
+        public void SetupDefaultProvider()
+        {
+            var defaultProvider =
+                PlayerProviders.FirstOrDefault(c => c.Key == this.configuration.PlayerSettings.DefaultProvider);
+            if (defaultProvider != null)
             {
-                foreach (var playerProvider in task.Result)
-                {
-                    PlayerProviders.Add(playerProvider.GetType(), playerProvider);
-
-                    if (_plugin.Configuration.PlayerSettings.DefaultProvider == playerProvider.GetType().FullName)
-                        CurrentPlayerProvider ??= playerProvider;
-                }
-
-                ProvidersLoading = false;
-            });
+                CurrentPlayerProvider = defaultProvider;
+            }
         }
 
         private Task<IPlayerProvider> InitializeProvider(Type type, IPlayerProvider playerProvider)
         {
-            return playerProvider.Initialize(_plugin);
+            return playerProvider.Initialize();
         }
 
-        private void Update()
+        private void Update(IFramework framework)
         {
             foreach (var playerProvider in PlayerProviders)
-                playerProvider.Value.Update();
+                playerProvider.Update();
         }
 
-        private void DisposeProviders()
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
-            foreach (var playerProvider in PlayerProviders)
+            this.framework.Update += Update;
+            return base.StartAsync(cancellationToken);
+        }
+
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            this.framework.Update -= Update;
+            return base.StopAsync(cancellationToken);
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await BackgroundProcessing(stoppingToken);
+        }
+
+        private async Task BackgroundProcessing(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
             {
-                playerProvider.Value.Dispose();
-            }
-        }
+                var uninitializedProvider = PlayerProviders.FirstOrDefault(c => !c.Initialized);
+                if (uninitializedProvider != null)
+                {
+                    await uninitializedProvider.Initialize();
+                }
 
-        public void Dispose()
-        {
-            DisposeProviders();
+                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+            }
         }
     }
 }

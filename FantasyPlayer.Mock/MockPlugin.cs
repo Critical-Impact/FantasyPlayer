@@ -1,77 +1,23 @@
-using DalaMock.Dalamud;
-using DalaMock.Interfaces;
-using DalaMock.Mock;
-using Dalamud.Interface.ImGuiFileDialog;
-using FantasyPlayer.Config;
-using FantasyPlayer.Interface;
-using FantasyPlayer.Interfaces;
-using FantasyPlayer.Manager;
-
 namespace FantasyPlayer.Mock;
 
-public class MockPlugin : IMockPlugin, IDisposable, IPlugin
+using Autofac;
+using DalaMock.Core.Mocks;
+using DalaMock.Core.Windows;
+using DalaMock.Shared.Interfaces;
+using Dalamud.Interface.Windowing;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+
+public class MockPlugin : Plugin
 {
-    public InterfaceController? InterfaceController { get; set; }
-    public Configuration Configuration { get; set; }
-
-    public PlayerManager PlayerManager { get; set; }
-    public IConfigurationManager ConfigurationManager { get; }
-    public CommandManagerFp CommandManager { get; set; }
-
-    public void DisplaySongTitle(string songTitle)
+    public MockPlugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
     {
-        Console.WriteLine("Now playing: " + songTitle);
     }
 
-    public void DisplayMessage(string message)
+    public override void ConfigureContainer(ContainerBuilder containerBuilder)
     {
-        Console.WriteLine("Displaying message: " + message);
-    }
-
-    private MockPluginInterfaceService _mockPluginInterfaceService;
-    private FileDialogManager _fileDialogManager;
-    private MockWindow? _mockWindow;
-    private bool _isStarted;
-
-    public MockPlugin()
-    {
-        ConfigurationManager = new MockConfigurationManager();
-    }
-
-    
-    public void Draw()
-    {
-        InterfaceController?.Draw();
-        _mockWindow?.Draw();
-    }
-
-
-    public void Dispose()
-    {
-        
-    }
-
-    public bool IsStarted => _isStarted;
-
-    public void Start(MockProgram program, MockService mockService, DalaMock.Dalamud.MockPluginInterfaceService mockPluginInterfaceService)
-    {
-        Service.Interface = mockPluginInterfaceService;
-        CommandManager = new CommandManagerFp(this);
-        ConfigurationManager.ConfigurationFile = mockPluginInterfaceService.ConfigFile.FullName;
-        ConfigurationManager.Load();
-        Configuration = ConfigurationManager.Config;
-        _mockWindow = new MockWindow(this);
-        PlayerManager = new PlayerManager(this);
-        InterfaceController = new InterfaceController(this);
-        _isStarted = true;
-    }
-
-    public void Stop(MockProgram program, MockService mockService, DalaMock.Dalamud.MockPluginInterfaceService mockPluginInterfaceService)
-    {
-        InterfaceController?.Dispose();
-        PlayerManager.Dispose();
-        InterfaceController = null;
-        Service.Interface.Dispose();
-        _isStarted = false;
+        base.ConfigureContainer(containerBuilder);
+        containerBuilder.RegisterType<MockWindowSystem>().As<IWindowSystem>();
+        containerBuilder.RegisterType<MockFont>().As<IFont>();
     }
 }

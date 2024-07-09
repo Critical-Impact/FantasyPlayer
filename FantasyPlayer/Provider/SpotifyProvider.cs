@@ -9,44 +9,69 @@ using SpotifyAPI.Web;
 
 namespace FantasyPlayer.Provider
 {
+    using Config;
+    using Dalamud.Plugin.Services;
+    using Manager;
+
     public class SpotifyProvider : IPlayerProvider
     {
+        private readonly ConfigurationManager configurationManager;
+        private readonly Configuration configuration;
+        private readonly ChatMessageService chatMessageService;
+        private readonly IChatGui chatGui;
+
+        public SpotifyProvider(ConfigurationManager configurationManager, Configuration configuration, ChatMessageService chatMessageService, IChatGui chatGui)
+        {
+            this.configurationManager = configurationManager;
+            this.configuration = configuration;
+            this.chatMessageService = chatMessageService;
+            this.chatGui = chatGui;
+        }
         public PlayerStateStruct PlayerState { get; set; }
         
-        private IPlugin _plugin;
         private SpotifyState _spotifyState;
         private string _lastId;
         
         private CancellationTokenSource _startCts;
         private CancellationTokenSource _loginCts;
+        private bool initialized;
 
-        public async Task<IPlayerProvider> Initialize(IPlugin plugin)
+        public async Task<IPlayerProvider> Initialize()
         {
-            _plugin = plugin;
             PlayerState = new PlayerStateStruct
             {
                 ServiceName = "Spotify",
                 RequiresLogin = true
             };
 
-            _spotifyState = new SpotifyState(Constants.SpotifyLoginUri, Constants.SpotifyClientId,
-                Constants.SpotifyLoginPort, Constants.SpotifyPlayerRefreshTime);
+            _spotifyState = new SpotifyState(Constants.SpotifyLoginUri, Constants.SpotifyClientId, Constants.SpotifyLoginPort, Constants.SpotifyPlayerRefreshTime);
 
             _spotifyState.OnLoggedIn += OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate += OnPlayerStateUpdate;
-            
-            if (_plugin.Configuration.SpotifySettings.TokenResponse == null) return this;
-            _spotifyState.TokenResponse = _plugin.Configuration.SpotifySettings.TokenResponse;
+
+            if (configuration.SpotifySettings.TokenResponse == null)
+            {
+                initialized = true;
+                return this;
+            }
+            _spotifyState.TokenResponse = configuration.SpotifySettings.TokenResponse;
             await _spotifyState.RequestToken();
             _startCts = new CancellationTokenSource();
             await Task.Run(() => _spotifyState.Start(_startCts.Token), _startCts.Token);
+            initialized = true;
             return this;
         }
+
+        public string Key => "spotify";
+
+        public string Name => "Spotify";
+
+        public bool Initialized => initialized;
 
         private void OnPlayerStateUpdate(CurrentlyPlayingContext currentlyPlaying, FullTrack playbackItem)
         {
             if (playbackItem.Id != _lastId)
-                _plugin.DisplaySongTitle(playbackItem.Name);
+                chatMessageService.DisplaySongTitle(playbackItem.Name);
             _lastId = playbackItem.Id;
 
 
@@ -77,28 +102,26 @@ namespace FantasyPlayer.Provider
             playerStateStruct.IsLoggedIn = true;
             PlayerState = playerStateStruct;
 
-            _plugin.Configuration.SpotifySettings.TokenResponse = tokenResponse;
+            configuration.SpotifySettings.TokenResponse = tokenResponse;
 
             if (_spotifyState.IsPremiumUser)
-                _plugin.Configuration.SpotifySettings.LimitedAccess = false;
+                configuration.SpotifySettings.LimitedAccess = false;
 
             if (!_spotifyState.IsPremiumUser)
             {
-                if (!_plugin.Configuration.SpotifySettings.LimitedAccess
+                if (!configuration.SpotifySettings.LimitedAccess
                 ) //Do a check to not spam the user, I don't want to force it down their throats. (fuck marketing)
-                    Service.ChatGui.PrintError(
+                    chatGui.PrintError(
                         "Uh-oh, it looks like you're not premium on Spotify. Some features in Fantasy Player have been disabled.");
 
-                _plugin.Configuration.SpotifySettings.LimitedAccess = true;
+                configuration.SpotifySettings.LimitedAccess = true;
 
                 //Change configs
-                if (_plugin.Configuration.PlayerSettings.CompactPlayer)
-                    _plugin.Configuration.PlayerSettings.CompactPlayer = false;
-                if (!_plugin.Configuration.PlayerSettings.NoButtons)
-                    _plugin.Configuration.PlayerSettings.NoButtons = true;
+                if (configuration.PlayerSettings.CompactPlayer)
+                    configuration.PlayerSettings.CompactPlayer = false;
+                if (!configuration.PlayerSettings.NoButtons)
+                    configuration.PlayerSettings.NoButtons = true;
             }
-
-            _plugin.ConfigurationManager.Save();
         }
 
         public void Update()
@@ -171,6 +194,16 @@ namespace FantasyPlayer.Provider
         {
             if (_spotifyState.CurrentlyPlaying != null)
                 _spotifyState.SetVolume(volume);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Initialize();
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

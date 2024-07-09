@@ -6,174 +6,219 @@ using OtterGui.Widgets;
 
 namespace FantasyPlayer.Interface.Window
 {
-    public class SettingsWindow
+    using Config;
+    using DalaMock.Host.Mediator;
+    using Dalamud.Interface.Windowing;
+    using Dalamud.Plugin.Services;
+    using FantasyPlayer.Mediator;
+    using Serilog;
+
+    public class SettingsWindow : UpdatingWindow
     {
-        private IPlugin _plugin;
+        private readonly Configuration _configuration;
+        private readonly ConfigurationManager _configurationManager;
+        private readonly CommandManagerFp commandManagerFp;
 
-        public SettingsWindow(IPlugin plugin)
+        public SettingsWindow(IPluginLog logger, MediatorService mediatorService, Configuration configuration, ConfigurationManager configurationManager, CommandManagerFp commandManagerFp) : base(logger, mediatorService, "Fantasy Player - Configuration", ImGuiWindowFlags.NoScrollbar)
         {
-            _plugin = plugin;
-
-            _plugin.CommandManager.Commands.Add("config",
-                (OptionType.Boolean, new string[] {"settings"}, "Toggles config display.", OnConfigCommand));
+            _configuration = configuration;
+            _configurationManager = configurationManager;
+            this.commandManagerFp = commandManagerFp;
+            MediatorService.Subscribe<ConfigurationUpdatedMessage>(this, ConfigurationUpdated );
         }
 
-
-        public void WindowLoop()
+        public override void OnClose()
         {
-            if (!_plugin.Configuration.ConfigShown)
-                return;
+            _configuration.ConfigShown = false;
+            base.OnClose();
+        }
 
+        private void ConfigurationUpdated(ConfigurationUpdatedMessage obj)
+        {
+            if (_configuration.ConfigShown && !IsOpen)
+            {
+                IsOpen = true;
+            }
+            if (!_configuration.ConfigShown && IsOpen)
+            {
+                IsOpen = false;
+            }
+        }
+
+        public override bool DrawConditions()
+        {
+            if (!_configuration.ConfigShown)
+            {
+                return false;
+            }
+
+            return base.DrawConditions();
+        }
+
+        public override void Draw()
+        {
             MainWindow();
+        }
+
+        public override void Update()
+        {
+
         }
 
         private void MainWindow()
         {
-            if (ImGui.Begin("Fantasy Player Config", ref _plugin.Configuration.ConfigShown,
-                ImGuiWindowFlags.NoScrollbar))
+            ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
+            ImGui.Text($"Type '{commandManagerFp.Command} help' to display chat commands!");
+            ImGui.PopStyleColor();
+
+            if (ImGui.CollapsingHeader("Fantasy Player"))
             {
-                ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
-                ImGui.Text($"Type '{Plugin.Command} help' to display chat commands!");
-                ImGui.PopStyleColor();
-
-                if (ImGui.CollapsingHeader("Fantasy Player"))
+                var displayChatMessages = _configuration.DisplayChatMessages;
+                if (ImGui.Checkbox("Display chat messages", ref displayChatMessages))
                 {
-                    if (ImGui.Checkbox("Display chat messages", ref _plugin.Configuration.DisplayChatMessages))
-                        _plugin.ConfigurationManager.Save();
-                    if (Widget.DrawChatTypeSelector("Chat message output channel",
-                            "To which chat channel should the fantasy player messages be echo'd?",
-                            _plugin.Configuration.PlayerSettings.ChatType,
-                            type => { _plugin.Configuration.PlayerSettings.ChatType = type; }))
+                    _configuration.DisplayChatMessages = displayChatMessages;
+                }
+                if (Widget.DrawChatTypeSelector("Chat message output channel",
+                        "To which chat channel should the fantasy player messages be echo'd?",
+                        _configuration.PlayerSettings.ChatType,
+                        type => { _configuration.PlayerSettings.ChatType = type; }))
+                {
+                }
+            }
+
+            if (!_configuration.SpotifySettings.LimitedAccess)
+            {
+                if (ImGui.CollapsingHeader("Auto-play Settings"))
+                {
+                    var playInDuty = _configuration.AutoPlaySettings.PlayInDuty;
+                    if (ImGui.Checkbox("Auto play when entering Duty",
+                            ref playInDuty))
                     {
-                        _plugin.ConfigurationManager.Save();
+                        _configuration.AutoPlaySettings.PlayInDuty = playInDuty;
                     }
                 }
+            }
 
-                if (!_plugin.Configuration.SpotifySettings.LimitedAccess)
+            if (ImGui.CollapsingHeader("Player Settings"))
+            {
+                if (_configuration.SpotifySettings.LimitedAccess)
                 {
-                    if (ImGui.CollapsingHeader("Auto-play Settings"))
-                    {
-                        if (ImGui.Checkbox("Auto play when entering Duty",
-                            ref _plugin.Configuration.AutoPlaySettings.PlayInDuty))
-                            _plugin.ConfigurationManager.Save();
-                    }
+                    ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
+                    ImGui.Text("You're not premium on Spotify. Some settings have been hidden.");
+                    ImGui.PopStyleColor();
                 }
 
-                if (ImGui.CollapsingHeader("Player Settings"))
+                ImGui.Separator();
+
+                var onlyWhenLoggedIn = _configuration.PlayerSettings.OnlyOpenWhenLoggedIn;
+                if (ImGui.Checkbox("Only open when logged in",
+                        ref onlyWhenLoggedIn))
                 {
-                    if (_plugin.Configuration.SpotifySettings.LimitedAccess)
+                    _configuration.PlayerSettings.OnlyOpenWhenLoggedIn = onlyWhenLoggedIn;
+                }
+
+                ImGui.Separator();
+
+                if (!_configuration.SpotifySettings.LimitedAccess)
+                {
+                    var compactPlayer = _configuration.PlayerSettings.CompactPlayer;
+                    if (ImGui.Checkbox("Compact mode", ref compactPlayer))
                     {
-                        ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
-                        ImGui.Text("You're not premium on Spotify. Some settings have been hidden.");
-                        ImGui.PopStyleColor();
+                        if (_configuration.PlayerSettings.NoButtons)
+                            _configuration.PlayerSettings.NoButtons = false;
+                        _configuration.PlayerSettings.CompactPlayer = compactPlayer;
                     }
 
-                    ImGui.Separator();
-
-                    if (ImGui.Checkbox("Only open when logged in",
-                        ref _plugin.Configuration.PlayerSettings.OnlyOpenWhenLoggedIn))
-                        _plugin.ConfigurationManager.Save();
-
-                    ImGui.Separator();
-
-                    if (!_plugin.Configuration.SpotifySettings.LimitedAccess)
+                    var noButtons = _configuration.PlayerSettings.NoButtons;
+                    if (ImGui.Checkbox("Hide buttons", ref noButtons))
                     {
-                        if (ImGui.Checkbox("Compact mode", ref _plugin.Configuration.PlayerSettings.CompactPlayer))
-                        {
-                            if (_plugin.Configuration.PlayerSettings.NoButtons)
-                                _plugin.Configuration.PlayerSettings.NoButtons = false;
-                            _plugin.ConfigurationManager.Save();
-                        }
-
-                        if (ImGui.Checkbox("Hide buttons", ref _plugin.Configuration.PlayerSettings.NoButtons))
-                        {
-                            if (_plugin.Configuration.PlayerSettings.CompactPlayer)
-                                _plugin.Configuration.PlayerSettings.CompactPlayer = false;
-                            _plugin.ConfigurationManager.Save();
-                        }
-                    }
-
-                    ImGui.Separator();
-
-                    if (ImGui.Checkbox("Player shown", ref _plugin.Configuration.PlayerSettings.PlayerWindowShown))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    if (ImGui.Checkbox("Player locked", ref _plugin.Configuration.PlayerSettings.PlayerLocked))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    if (ImGui.Checkbox("Player input disabled",
-                        ref _plugin.Configuration.PlayerSettings.DisableInput))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    if (ImGui.Checkbox("Show time elapsed",
-                        ref _plugin.Configuration.PlayerSettings.ShowTimeElapsed))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    ImGui.Separator();
-
-                    if (ImGui.SliderFloat("Player alpha", ref _plugin.Configuration.PlayerSettings.Transparency, 0f,
-                        1f))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    if (ImGui.ColorEdit4("Player color", ref _plugin.Configuration.PlayerSettings.AccentColor))
-                    {
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    ImGui.SameLine();
-                    if (ImGui.Button("Revert"))
-                    {
-                        _plugin.Configuration.PlayerSettings.AccentColor = InterfaceUtils.FantasyPlayerColor;
-                        _plugin.ConfigurationManager.Save();
-                    }
-
-                    ImGui.Separator();
-
-                    if (ImGui.Button("Compact mode"))
-                        _plugin.Configuration.PlayerSettings.FirstRunCompactPlayer = true;
-
-                    ImGui.SameLine();
-                    if (ImGui.Button("Hide buttons"))
-                        _plugin.Configuration.PlayerSettings.FirstRunSetNoButtons = true;
-
-                    ImGui.SameLine();
-                    if (ImGui.Button("Full"))
-                        _plugin.Configuration.PlayerSettings.FirstRunNone = true;
-
-                    ImGui.SameLine();
-                    ImGui.Text("Revert to default size");
-
-                    ImGui.Separator();
-
-                    if (ImGui.Checkbox("Show debug window", ref _plugin.Configuration.PlayerSettings.DebugWindowOpen))
-                    {
-                        _plugin.ConfigurationManager.Save();
+                        if (_configuration.PlayerSettings.CompactPlayer)
+                            _configuration.PlayerSettings.CompactPlayer = false;
+                        _configuration.PlayerSettings.NoButtons = noButtons;
                     }
                 }
 
                 ImGui.Separator();
 
-                ImGui.End();
+                var playerWindowShown = _configuration.PlayerSettings.PlayerWindowShown;
+                if (ImGui.Checkbox("Player shown", ref playerWindowShown))
+                {
+                    _configuration.PlayerSettings.PlayerWindowShown = playerWindowShown;
+                }
+
+                var playerLocked = _configuration.PlayerSettings.PlayerLocked;
+                if (ImGui.Checkbox("Player locked", ref playerLocked))
+                {
+                    _configuration.PlayerSettings.PlayerLocked = playerLocked;
+                }
+
+                var disableInput = _configuration.PlayerSettings.DisableInput;
+                if (ImGui.Checkbox("Player input disabled", ref disableInput))
+                {
+                    _configuration.PlayerSettings.DisableInput = disableInput;
+                }
+
+                var timeElapsed = _configuration.PlayerSettings.ShowTimeElapsed;
+                if (ImGui.Checkbox("Show time elapsed",
+                        ref timeElapsed))
+                {
+                    _configuration.PlayerSettings.ShowTimeElapsed = timeElapsed;
+                }
+
+                ImGui.Separator();
+
+                var transparency = _configuration.PlayerSettings.Transparency;
+                if (ImGui.SliderFloat("Player alpha", ref transparency, 0f,
+                        1f))
+                {
+                    _configuration.PlayerSettings.Transparency = transparency;
+                }
+
+                var accentColor = _configuration.PlayerSettings.AccentColor;
+                if (ImGui.ColorEdit4("Player color", ref accentColor))
+                {
+                    _configuration.PlayerSettings.AccentColor = accentColor;
+                }
+
+                ImGui.NewLine();
+                if (ImGui.Button("Revert"))
+                {
+                    _configuration.PlayerSettings.AccentColor = InterfaceUtils.FantasyPlayerColor;
+                    _configuration.PlayerSettings.FirstRunNone = true;
+                }
+                ImGui.SameLine();
+                ImGui.Text("Revert to default size");
+
+                ImGui.Separator();
+                if (ImGui.Button("Compact mode"))
+                {
+                    _configuration.PlayerSettings.FirstRunCompactPlayer = true;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Hide buttons"))
+                {
+                    _configuration.PlayerSettings.FirstRunSetNoButtons = true;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Full"))
+                {
+                    _configuration.PlayerSettings.FirstRunNone = true;
+                }
+
+
+
+                ImGui.Separator();
+
+                var debugWindowOpen = _configuration.PlayerSettings.DebugWindowOpen;
+                if (ImGui.Checkbox("Show debug window", ref debugWindowOpen))
+                {
+                    _configuration.PlayerSettings.DebugWindowOpen = debugWindowOpen;
+                }
             }
-        }
 
-        public void OnConfigCommand(bool boolValue, int intValue, CallbackResponse response)
-        {
-            if (response == CallbackResponse.SetValue)
-                _plugin.Configuration.ConfigShown = boolValue;
-
-            if (response == CallbackResponse.ToggleValue)
-                _plugin.Configuration.ConfigShown = !_plugin.Configuration.ConfigShown;
+            ImGui.Separator();
         }
     }
 }

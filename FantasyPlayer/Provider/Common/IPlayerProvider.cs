@@ -4,14 +4,17 @@ using FantasyPlayer.Interfaces;
 
 namespace FantasyPlayer.Provider.Common
 {
-    public interface IPlayerProvider
+    using System;
+    using Microsoft.Extensions.Hosting;
+
+    public interface IPlayerProvider : IHostedService, IDisposable
     {
         public PlayerStateStruct PlayerState { get; set; }
-
-        public Task<IPlayerProvider> Initialize(IPlugin plugin);
+        public Task<IPlayerProvider> Initialize();
+        public string Key { get; }
+        public string Name { get; }
+        public bool Initialized { get; }
         public void Update();
-        public void Dispose();
-
         public void StartAuth();
         public void RetryAuth();
         public void ReAuth();

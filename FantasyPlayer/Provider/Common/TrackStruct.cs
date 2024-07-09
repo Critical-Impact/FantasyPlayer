@@ -2,7 +2,7 @@
 {
     public struct TrackStruct
     {
-        public string Id;
+        public string? Id;
         public string Name;
         public string[] Artists;
         public AlbumStruct Album;

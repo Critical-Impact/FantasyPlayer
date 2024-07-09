@@ -1,12 +1,4 @@
-﻿using System;
-using DalaMock.Shared;
-using DalaMock.Shared.Classes;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.Command;
-using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
@@ -15,116 +7,58 @@ using FantasyPlayer.Manager;
 
 namespace FantasyPlayer
 {
-    public class Plugin : IDalamudPlugin, IPlugin
+    using Autofac;
+    using DalaMock.Host;
+    using DalaMock.Host.Hosting;
+    using DalaMock.Host.Mediator;
+    using DalaMock.Shared.Classes;
+    using DalaMock.Shared.Interfaces;
+    using Dalamud.Interface.Windowing;
+    using Interface.Window;
+    using Microsoft.Extensions.DependencyInjection;
+    using Provider;
+    using Provider.Common;
+
+    public class Plugin : HostedPlugin
     {
-        public string Name => "FantasyPlayer";
-        public const string Command = "/pfp";
-
-        public InterfaceController InterfaceController { get; set; }
-        public DalamudPluginInterface PluginInterface { get; private set; }
-        public Configuration Configuration { get; set; }
-        public PlayerManager PlayerManager { get; set; }
-        public IClientState ClientState { get; set; }
-        public IConfigurationManager ConfigurationManager { get; set; }
-        public CommandManagerFp CommandManager { get; set; }
-
-        public Plugin(DalamudPluginInterface pluginInterface)
+        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
         {
-            PluginInterface = pluginInterface;
-            PluginInterface.Create<Service>();
-            Service.Interface = new PluginInterfaceService(pluginInterface);
-            ClientState = Service.ClientState;
-
-            ConfigurationManager = new ConfigurationManager(PluginInterface);
-            ConfigurationManager.Load();
-            Configuration = ConfigurationManager.Config;
-
-            Service.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
+            CreateHost();
+            Start();
+        }
+        
+        public override void ConfigureContainer(ContainerBuilder containerBuilder)
+        {
+            containerBuilder.RegisterType<ConfigurationManager>().SingleInstance();
+            containerBuilder.Register(provider =>
             {
-                HelpMessage = "Run commands for Fantasy Player"
-            });
-
-            //Setup player
-            PlayerManager = new PlayerManager(this);
-            
-            CommandManager = new CommandManagerFp(this);
-
-            InterfaceController = new InterfaceController(this);
-
-            PluginInterface.UiBuilder.Draw += InterfaceController.Draw;
-            PluginInterface.UiBuilder.OpenConfigUi += OpenConfig;
+                var configurationManager = provider.Resolve<ConfigurationManager>();
+                configurationManager.Load();
+                var configuration = configurationManager.Config;
+                return configuration;
+            }).As<Configuration>().SingleInstance();
+            containerBuilder.RegisterType<MediatorService>().SingleInstance();
+            containerBuilder.RegisterType<SpotifyProvider>().SingleInstance();
+            containerBuilder.RegisterType<CommandManagerFp>().SingleInstance();
+            containerBuilder.RegisterType<PlayerManager>().SingleInstance();
+            containerBuilder.RegisterType<ChatMessageService>().SingleInstance();
+            containerBuilder.RegisterType<InterfaceController>().SingleInstance();
+            containerBuilder.RegisterType<SettingsWindow>().As<Window>().SingleInstance();
+            containerBuilder.RegisterType<PlayerWindow>().As<Window>().SingleInstance();
+            containerBuilder.RegisterType<DebugWindow>().As<Window>().SingleInstance();
+            containerBuilder.RegisterType<CommandsService>().SingleInstance();
+            containerBuilder.RegisterType<Font>().As<IFont>().SingleInstance();
+            containerBuilder.RegisterType<SpotifyProvider>().As<IPlayerProvider>().SingleInstance();
         }
 
-        private void OnCommand(string command, string arguments)
+        public override void ConfigureServices(IServiceCollection serviceCollection)
         {
-            CommandManager.ParseCommand(arguments);
-        }
-
-        public void DisplayMessage(string message)
-        {
-            if (!Configuration.DisplayChatMessages)
-                return;
-
-            var entry = new XivChatEntry()
-            {
-                Message = message,
-                Name = SeString.Empty,
-                Type = Configuration.PlayerSettings.ChatType,
-            };
-            Service.ChatGui.Print(entry);
-        }
-
-        public void DisplaySongTitle(string songTitle)
-        {
-            if (!Configuration.DisplayChatMessages)
-                return;
-
-            var message = PluginInterface.UiLanguage switch
-            {
-                "ja" => new SeString(new Payload[]
-                    {
-                        new TextPayload($"「{songTitle}」を再生しました。"), // 「Weight of the World／Prelude Version」を再生しました。
-                    }),
-                "de" => new SeString(new Payload[]
-                    {
-                        new TextPayload($"„{songTitle}“ wird nun wiedergegeben."), // „Weight of the World (Prelude Version)“ wird nun wiedergegeben.
-                    }),
-                "fr" => new SeString(new Payload[]
-                    {
-                        new TextPayload($"Le FantasyPlayer lit désormais “{songTitle}”."), // L'orchestrion joue désormais “Weight of the World (Prelude Version)”.
-                    }),
-                _ => new SeString(new Payload[]
-                    {
-                        new EmphasisItalicPayload(true),
-                        new TextPayload(songTitle), // _Weight of the World (Prelude Version)_ is now playing.
-                        new EmphasisItalicPayload(false),
-                        new TextPayload(" is now playing."),
-                    }),
-            };
-
-            var entry = new XivChatEntry()
-            {
-                Message = message,
-                Name = SeString.Empty,
-                Type = Configuration.PlayerSettings.ChatType,
-            };
-            Service.ChatGui.Print(entry);
-        }
-
-        public void OpenConfig()
-        {
-            Configuration.ConfigShown = true;
-        }
-
-        public void Dispose()
-        {
-            ConfigurationManager.Save();
-            Service.CommandManager.RemoveHandler(Command);
-            PluginInterface.UiBuilder.Draw -= InterfaceController.Draw;
-            PluginInterface.UiBuilder.OpenConfigUi -= OpenConfig;
-
-            InterfaceController.Dispose();
-            PlayerManager.Dispose();
+            serviceCollection.AddHostedService(p => p.GetRequiredService<ConfigurationManager>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<InterfaceController>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<CommandManagerFp>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<PlayerManager>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<CommandsService>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<MediatorService>());
         }
     }
 }

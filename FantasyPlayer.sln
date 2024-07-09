@@ -8,10 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtterGui", "OtterGui\OtterG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasyPlayer.Mock", "FantasyPlayer.Mock\FantasyPlayer.Mock.csproj", "{668953BC-B270-43F7-952B-706ABFDD6DEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DalaMock.Shared", "DalaMock\DalaMock.Shared\DalaMock.Shared.csproj", "{41785116-6E75-48D7-9590-6E202489271E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DalaMock.Mock", "DalaMock\DalaMock.Mock\DalaMock.Mock.csproj", "{E07B751C-DA15-4A28-AC63-C56453229718}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,13 +30,5 @@ Global
 		{668953BC-B270-43F7-952B-706ABFDD6DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{668953BC-B270-43F7-952B-706ABFDD6DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{668953BC-B270-43F7-952B-706ABFDD6DEC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{41785116-6E75-48D7-9590-6E202489271E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41785116-6E75-48D7-9590-6E202489271E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41785116-6E75-48D7-9590-6E202489271E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41785116-6E75-48D7-9590-6E202489271E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E07B751C-DA15-4A28-AC63-C56453229718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E07B751C-DA15-4A28-AC63-C56453229718}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E07B751C-DA15-4A28-AC63-C56453229718}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E07B751C-DA15-4A28-AC63-C56453229718}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

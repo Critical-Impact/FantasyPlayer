@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
   <PropertyGroup>
     <ProjectGuid>{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}</ProjectGuid>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Version>2.1.1.2</Version>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>FantasyPlayer</AssemblyTitle>
     <Product>FantasyPlayer</Product>
-    <Copyright>Copyright ©  2020</Copyright>
+    <Copyright>Copyright ©  2024</Copyright>
     <Deterministic>false</Deterministic>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
@@ -38,26 +36,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="8.0.0" />
+    <PackageReference Include="DalaMock.Host" Version="2.0.5" />
+    <PackageReference Include="DalaMock.Shared" Version="2.0.5" />
     <PackageReference Include="DalamudPackager" Version="2.1.12" />
     <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Dalamud">
-      <HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ImGui.NET">
-      <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ImGuiScene">
-      <HintPath>$(DalamudLibPath)ImGuiScene.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="../.repo_resources/logo.png">
@@ -70,7 +53,6 @@
     </ContentWithTargetPath>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DalaMock\DalaMock.Shared\DalaMock.Shared.csproj" />
     <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
     <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
   </ItemGroup>

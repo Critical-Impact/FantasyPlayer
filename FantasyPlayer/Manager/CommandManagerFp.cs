@@ -7,6 +7,12 @@ using FantasyPlayer.Interfaces;
 
 namespace FantasyPlayer.Manager
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Dalamud.Game.Command;
+    using Dalamud.Plugin.Services;
+    using Microsoft.Extensions.Hosting;
+
     public enum OptionType
     {
         None,
@@ -21,9 +27,11 @@ namespace FantasyPlayer.Manager
         ToggleValue
     }
 
-    public class CommandManagerFp
+    public class CommandManagerFp : IHostedService
     {
-        private IPlugin _plugin;
+        private readonly ICommandManager commandManager;
+        private readonly IChatGui chatGui;
+        public readonly string Command = "/pfp";
 
         public Dictionary<string, (OptionType type, string[] aliases, string helpString,
             Action<bool, int, CallbackResponse> commandCallback)> Commands { get; } =
@@ -31,18 +39,16 @@ namespace FantasyPlayer.Manager
                 Action<bool, int, CallbackResponse>
                 commandCallback)>();
 
-        public CommandManagerFp(IPlugin plugin)
+        public CommandManagerFp(ICommandManager commandManager, IChatGui chatGui)
         {
-            _plugin = plugin;
-
+            this.commandManager = commandManager;
+            this.chatGui = chatGui;
             Commands.Add("help", (OptionType.None, new string[] { "" }, "Show command help.", PrintHelp));
         }
 
         public void ParseCommand(string argsString)
         {
             var args = argsString.ToLower().Split(' ');
-
-            var chat = Service.ChatGui;
 
             if (args.Length == 0)
                 PrintHelp(false, 0, CallbackResponse.None);
@@ -84,7 +90,7 @@ namespace FantasyPlayer.Manager
                 {
                     if (args.Length < 2)
                     {
-                        chat.PrintError($"You need to provide a number for the '{command.Key}' command!");
+                        chatGui.PrintError($"You need to provide a number for the '{command.Key}' command!");
                         return;
                     }
 
@@ -94,13 +100,11 @@ namespace FantasyPlayer.Manager
                 }
             }
             
-            chat.PrintError("That command wasn't found. For a list of commands please type: '/pfp help'");
+            chatGui.PrintError("That command wasn't found. For a list of commands please type: '/pfp help'");
         }
 
         public void PrintHelp(bool boolValue, int intValue, CallbackResponse response)
         {
-            var chat = Service.ChatGui;
-
             var helpMessage = "";
             helpMessage += "Fantasy Player Command Help:\n";
 
@@ -116,7 +120,7 @@ namespace FantasyPlayer.Manager
             }
             
             helpMessage = helpMessage.Remove(helpMessage.Length - 1);
-            chat.Print(helpMessage);
+            chatGui.Print(helpMessage);
         }
 
         public string GetCommandExample(OptionType optionType)
@@ -132,6 +136,26 @@ namespace FantasyPlayer.Manager
                 default:
                     return "";
             }
+        }
+
+        private void OnCommand(string command, string arguments)
+        {
+            ParseCommand(arguments);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            commandManager.AddHandler(Command, new CommandInfo(OnCommand)
+            {
+                HelpMessage = "Run commands for Fantasy Player"
+            });
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            commandManager.RemoveHandler(Command);
+            return Task.CompletedTask;
         }
     }
 }

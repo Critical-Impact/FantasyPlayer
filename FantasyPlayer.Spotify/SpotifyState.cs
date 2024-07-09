@@ -47,7 +47,7 @@ namespace FantasyPlayer.Spotify
         private string _challenge;
         private string _verifier;
         private LoginRequest _loginRequest;
-        private CancellationTokenSource _stateUpdateCts;
+        private CancellationTokenSource? _stateUpdateCts;
 
         public SpotifyState(string loginUri, string clientId, int port, int playerRefreshTime)
         {
@@ -318,8 +318,8 @@ namespace FantasyPlayer.Spotify
 
         public void Dispose()
         {
-            _stateUpdateCts.Cancel();
-            _stateUpdateCts.Dispose();
+            _stateUpdateCts?.Cancel();
+            _stateUpdateCts?.Dispose();
             _server?.Stop();
             _spotifyClient = null;
         }

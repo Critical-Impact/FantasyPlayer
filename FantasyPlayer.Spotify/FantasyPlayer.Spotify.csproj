@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{64E9DE35-E1B3-467B-8AD5-E36BAB2A3F27}</ProjectGuid>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>FantasyPlayer.Spotify</AssemblyTitle>
     <Product>FantasyPlayer.Spotify</Product>
