@@ -46,9 +46,6 @@ public class CommandsService : IHostedService
         commandManager.Commands.Add("display",
             (OptionType.Boolean, new string[] { }, "Toggle player display.", OnDisplayCommand));
 
-
-        //TODO: remove me
-        configuration.ConfigShown = true;
         return Task.CompletedTask;
     }
 
