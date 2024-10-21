@@ -13,14 +13,15 @@
       },
       "DalaMock.Host": {
         "type": "Direct",
-        "requested": "[2.0.5, )",
-        "resolved": "2.0.5",
-        "contentHash": "aACvYvdMqmOokuO8XKjtoKClumw2xGXpniZVXJAFfz1PpfNWt7yZb8W60K+Q4acSzlDp4nd9ahZDxQjBrf2tOA==",
+        "requested": "[2.1.0-alpha, )",
+        "resolved": "2.1.0-alpha",
+        "contentHash": "jumOv2YyDUK/fByPktWEeuX3xapsAwbX4/2TP5icEIImdgtmr6R+Eh9nIczpaZV7aKg8gwraHJxEfqwbD4QJJQ==",
         "dependencies": {
           "Autofac.Extensions.DependencyInjection": "9.0.0",
-          "DalaMock.Shared": "2.0.5",
+          "DalaMock.Shared": "2.1.0-alpha",
           "Microsoft.Extensions.Hosting": "8.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
+          "Microsoft.Extensions.ObjectPool": "9.0.0-preview.6.24328.4",
           "Serilog": "2.11.0",
           "Serilog.Sinks.Async": "1.5.0",
           "Serilog.Sinks.Console": "4.0.1",
@@ -29,9 +30,9 @@
       },
       "DalaMock.Shared": {
         "type": "Direct",
-        "requested": "[2.0.5, )",
-        "resolved": "2.0.5",
-        "contentHash": "CJOdmfCLFVXh70XQsaNq/J3X4HP8Wou7sBV9NmeM8ND9Y0RJyE2u5Lqsnl3bgzwFj2xOa2UI4ioRKSTLaFEIlA==",
+        "requested": "[2.1.0-alpha, )",
+        "resolved": "2.1.0-alpha",
+        "contentHash": "9yzAf667cllJKmcZRnkXJ0wS0AOTIz8X8chtZpGKNN0cP+wL7TQoYUJyoAckxHxFpzqgAveZFLGSHAGmmyBG/g==",
         "dependencies": {
           "Autofac.Extensions.DependencyInjection": "9.0.0",
           "Microsoft.Extensions.Hosting": "8.0.0",
@@ -330,6 +331,11 @@
           "Microsoft.Extensions.Primitives": "8.0.0",
           "System.Text.Json": "8.0.0"
         }
+      },
+      "Microsoft.Extensions.ObjectPool": {
+        "type": "Transitive",
+        "resolved": "9.0.0-preview.6.24328.4",
+        "contentHash": "gtSoyW2B38YGz5TWzlZbi8AoPUryq00xvVBCGkN288lHU7e9oap/GSOwoi7bXGNOWnLJGske1yUZFDDj+3QGkw=="
       },
       "Microsoft.Extensions.Options": {
         "type": "Transitive",
