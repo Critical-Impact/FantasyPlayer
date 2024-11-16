@@ -37,8 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.0.0" />
-    <PackageReference Include="DalaMock.Host" Version="2.1.0-alpha" />
-    <PackageReference Include="DalaMock.Shared" Version="2.1.0-alpha" />
+    <PackageReference Include="DalaMock.Host" Version="2.1.1" />
+    <PackageReference Include="DalaMock.Shared" Version="2.1.1" />
     <PackageReference Include="DalamudPackager" Version="2.1.12" />
     <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
   </ItemGroup>
