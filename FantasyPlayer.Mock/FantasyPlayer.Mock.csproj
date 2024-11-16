@@ -59,8 +59,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DalaMock.Core" Version="2.1.0-alpha" />
-        <PackageReference Include="DalaMock.Shared" Version="2.1.0-alpha" />
+        <PackageReference Include="DalaMock.Core" Version="2.1.1" />
+        <PackageReference Include="DalaMock.Shared" Version="2.1.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
         <PackageReference Include="StbiSharp" Version="1.2.1" />
         <PackageReference Include="Veldrid" Version="4.9.0" />
