@@ -1,62 +1,44 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
-  <PropertyGroup>
-    <ProjectGuid>{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}</ProjectGuid>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Version>2.1.1.2</Version>
-    <LangVersion>latest</LangVersion>
-    <AssemblyTitle>FantasyPlayer</AssemblyTitle>
-    <Product>FantasyPlayer</Product>
-    <Copyright>Copyright ©  2024</Copyright>
-    <Deterministic>false</Deterministic>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <AllowedReferenceRelatedFileExtensions>
-      <!-- Prevent default XML and PDB files copied to output in RELEASE. Only *.allowedextension files will be included, which doesn't exist in my case. -->
-          *.pdb;
-          *.xml
-        </AllowedReferenceRelatedFileExtensions>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="SpotifyAPI.Web">
-      <HintPath>Dlls\SpotifyAPI.Web.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SpotifyAPI.Web.Auth">
-      <HintPath>Dlls\SpotifyAPI.Web.Auth.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Autofac" Version="8.0.0" />
-    <PackageReference Include="DalaMock.Host" Version="2.1.1" />
-    <PackageReference Include="DalaMock.Shared" Version="2.1.1" />
-    <PackageReference Include="DalamudPackager" Version="2.1.12" />
-    <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ContentWithTargetPath Include="../.repo_resources/logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Images\icon.png</TargetPath>
-    </ContentWithTargetPath>
-    <ContentWithTargetPath Include="../.repo_resources/player_preview.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Images\screenshot1.png</TargetPath>
-    </ContentWithTargetPath>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
-    <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="images" />
-  </ItemGroup>
+﻿<Project Sdk="Dalamud.NET.SDK/12.0.2">
+    <PropertyGroup>
+        <ProjectGuid>{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}</ProjectGuid>
+        <Version>2.1.1.2</Version>
+        <AssemblyTitle>FantasyPlayer</AssemblyTitle>
+        <Product>FantasyPlayer</Product>
+        <Copyright>Copyright © 2024</Copyright>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="SpotifyAPI.Web">
+            <HintPath>Dlls\SpotifyAPI.Web.dll</HintPath>
+            <Private>True</Private>
+        </Reference>
+        <Reference Include="SpotifyAPI.Web.Auth">
+            <HintPath>Dlls\SpotifyAPI.Web.Auth.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autofac" Version="8.0.0"/>
+        <PackageReference Include="DalaMock.Host" Version="2.2.0" />
+        <PackageReference Include="DalaMock.Shared" Version="2.2.0" />
+        <PackageReference Include="DalamudPackager" Version="2.1.12"/>
+        <PackageReference Include="SpotifyAPI.Web" Version="7.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ContentWithTargetPath Include="../.repo_resources/logo.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>Images\icon.png</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include="../.repo_resources/player_preview.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>Images\screenshot1.png</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj"/>
+        <ProjectReference Include="..\OtterGui\OtterGui.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="images"/>
+    </ItemGroup>
 </Project>

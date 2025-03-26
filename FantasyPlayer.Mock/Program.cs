@@ -1,4 +1,6 @@
-﻿namespace FantasyPlayer.Mock
+﻿using System.IO;
+
+namespace FantasyPlayer.Mock
 {
     using DalaMock.Core.DI;
     using DalaMock.Core.Mocks;
