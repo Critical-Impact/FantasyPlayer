@@ -1,11 +1,13 @@
-﻿namespace FantasyPlayer.Interface.Window;
+﻿using Microsoft.Extensions.Logging;
+
+namespace FantasyPlayer.Interface.Window;
 
 using System.Linq;
 using Config;
 using DalaMock.Host.Mediator;
 using Dalamud.Plugin.Services;
 using FantasyPlayer.Mediator;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Manager;
 using Provider.Common;
 using Serilog;
@@ -16,7 +18,7 @@ public class DebugWindow : UpdatingWindow
     private readonly Configuration configuration;
     private readonly IClientState clientState;
 
-    public DebugWindow(IPluginLog logger, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Debug")
+    public DebugWindow(ILogger<DebugWindow> logger, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Debug")
     {
         this.playerManager = playerManager;
         this.configuration = configuration;

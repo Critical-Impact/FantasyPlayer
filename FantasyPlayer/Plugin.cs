@@ -26,7 +26,15 @@ namespace FantasyPlayer
             CreateHost();
             Start();
         }
-        
+
+        public override HostedPluginOptions ConfigureOptions()
+        {
+            return new HostedPluginOptions()
+            {
+                UseMediatorService = true
+            };
+        }
+
         public override void ConfigureContainer(ContainerBuilder containerBuilder)
         {
             containerBuilder.RegisterType<ConfigurationManager>().SingleInstance();
@@ -37,7 +45,6 @@ namespace FantasyPlayer
                 var configuration = configurationManager.Config;
                 return configuration;
             }).As<Configuration>().SingleInstance();
-            containerBuilder.RegisterType<MediatorService>().SingleInstance();
             containerBuilder.RegisterType<SpotifyProvider>().SingleInstance();
             containerBuilder.RegisterType<CommandManagerFp>().SingleInstance();
             containerBuilder.RegisterType<PlayerManager>().SingleInstance();

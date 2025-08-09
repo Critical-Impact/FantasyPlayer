@@ -1,7 +1,8 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Bindings.ImGui;
 using System.Numerics;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
+using Microsoft.Extensions.Logging;
 using OtterGui.Widgets;
 
 namespace FantasyPlayer.Interface.Window
@@ -19,7 +20,7 @@ namespace FantasyPlayer.Interface.Window
         private readonly ConfigurationManager _configurationManager;
         private readonly CommandManagerFp commandManagerFp;
 
-        public SettingsWindow(IPluginLog logger, MediatorService mediatorService, Configuration configuration, ConfigurationManager configurationManager, CommandManagerFp commandManagerFp) : base(logger, mediatorService, "Fantasy Player - Configuration", ImGuiWindowFlags.NoScrollbar)
+        public SettingsWindow(ILogger<SettingsWindow> logger, MediatorService mediatorService, Configuration configuration, ConfigurationManager configurationManager, CommandManagerFp commandManagerFp) : base(logger, mediatorService, "Fantasy Player - Configuration", ImGuiWindowFlags.NoScrollbar)
         {
             _configuration = configuration;
             _configurationManager = configurationManager;

@@ -10,7 +10,9 @@ using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using FantasyPlayer.Provider;
 using FantasyPlayer.Provider.Common;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility.Raii;
+using Microsoft.Extensions.Logging;
 using OtterGui;
 
 namespace FantasyPlayer.Interface.Window
@@ -49,7 +51,7 @@ namespace FantasyPlayer.Interface.Window
             39 * ImGui.GetIO().FontGlobalScale);
 
 
-        public PlayerWindow(IPluginLog logger, IUiBuilder uiBuilder, IFont font, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, ConfigurationManager configurationManager, ICondition condition, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Player")
+        public PlayerWindow(ILogger<PlayerWindow> logger, IUiBuilder uiBuilder, IFont font, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, ConfigurationManager configurationManager, ICondition condition, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Player")
         {
             this.uiBuilder = uiBuilder;
             this.font = font;
@@ -259,7 +261,7 @@ namespace FantasyPlayer.Interface.Window
 
             //////////////// Right click popup ////////////////
 
-            if (ImGui.BeginPopupContextWindow())
+            if (ImGui.BeginPopupContextWindow("RightClick"))
             {
                 if (_playerManager.PlayerProviders.Count > 1)
                 {
@@ -276,14 +278,14 @@ namespace FantasyPlayer.Interface.Window
                         }
                         ImGui.EndMenu();
                     }
-                    
+
                     ImGui.Separator();
                 }
 
                 if (!configuration.SpotifySettings.LimitedAccess)
                 {
                     var compactPlayer = configuration.PlayerSettings.CompactPlayer;
-                    if (ImGui.MenuItem("Compact mode", null, ref compactPlayer))
+                    if (ImGui.MenuItem("Compact mode", ref compactPlayer))
                     {
                         if (configuration.PlayerSettings.NoButtons)
                             configuration.PlayerSettings.NoButtons = false;
@@ -291,7 +293,7 @@ namespace FantasyPlayer.Interface.Window
                     }
 
                     var noButtons = configuration.PlayerSettings.NoButtons;
-                    if (ImGui.MenuItem("Hide Buttons", null, ref noButtons))
+                    if (ImGui.MenuItem("Hide Buttons", ref noButtons))
                     {
                         if (configuration.PlayerSettings.CompactPlayer)
                             configuration.PlayerSettings.CompactPlayer = false;
@@ -302,19 +304,19 @@ namespace FantasyPlayer.Interface.Window
                 }
 
                 var playerSettingsPlayerLocked = configuration.PlayerSettings.PlayerLocked;
-                if (ImGui.MenuItem("Lock player", null, ref playerSettingsPlayerLocked))
+                if (ImGui.MenuItem("Lock player", ref playerSettingsPlayerLocked))
                 {
                     configuration.PlayerSettings.PlayerLocked = playerSettingsPlayerLocked;
                 }
 
                 var playerWindowShown = configuration.PlayerSettings.PlayerWindowShown;
-                if (ImGui.MenuItem("Show player", null, ref playerWindowShown))
+                if (ImGui.MenuItem("Show player", ref playerWindowShown))
                 {
                     configuration.PlayerSettings.PlayerWindowShown = playerWindowShown;
                 }
 
                 var configShown = configuration.ConfigShown;
-                if (ImGui.MenuItem("Show config", null, ref configShown))
+                if (ImGui.MenuItem("Show config", ref configShown))
                 {
                     configuration.ConfigShown = configShown;
                 }
@@ -447,7 +449,7 @@ namespace FantasyPlayer.Interface.Window
                     ImGui.PushStyleColor(ImGuiCol.PlotHistogram, configuration.PlayerSettings.AccentColor);
                     ImGui.ProgressBar(percent / 100f, new Vector2(-1, 2f));
                     ImGui.PopStyleColor();
-                    
+
 
                     Vector2 imageSize = new Vector2(100 * ImGui.GetIO().FontGlobalScale,
                         100 * ImGui.GetIO().FontGlobalScale);
