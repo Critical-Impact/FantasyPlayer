@@ -66,16 +66,16 @@ namespace FantasyPlayer.Manager
                 playerProvider.Update();
         }
 
-        public override Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
             this.framework.Update += Update;
-            return base.StartAsync(cancellationToken);
+            await base.StartAsync(cancellationToken);
         }
 
-        public override Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
             this.framework.Update -= Update;
-            return base.StopAsync(cancellationToken);
+            await base.StopAsync(cancellationToken);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

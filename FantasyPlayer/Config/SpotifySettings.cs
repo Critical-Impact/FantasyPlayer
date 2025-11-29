@@ -8,7 +8,7 @@ namespace FantasyPlayer.Config
 
     public class SpotifySettings : INotifyPropertyChanged
     {
-        private PKCETokenResponse tokenResponse;
+        private PKCETokenResponse? tokenResponse;
         private bool limitedAccess;
 
         private bool isDirty;
@@ -18,12 +18,19 @@ namespace FantasyPlayer.Config
             set => SetField(ref isDirty, value, false);
         }
 
+        private string spotifyClientId;
+        public string SpotifyClientId
+        {
+            get => spotifyClientId;
+            set => SetField(ref spotifyClientId, value, false);
+        }
+
         public void MarkClean()
         {
             IsDirty = false;
         }
 
-        public PKCETokenResponse TokenResponse
+        public PKCETokenResponse? TokenResponse
         {
             get => tokenResponse;
             set => SetField(ref tokenResponse, value);
@@ -37,7 +44,7 @@ namespace FantasyPlayer.Config
 
         public SpotifySettings()
         {
-            
+
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

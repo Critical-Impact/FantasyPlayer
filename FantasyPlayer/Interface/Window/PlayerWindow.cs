@@ -172,7 +172,17 @@ namespace FantasyPlayer.Interface.Window
 
         public void DrawWelcome()
         {
-            if (_playerManager.ProvidersLoading)
+            if (string.IsNullOrEmpty(configuration.SpotifySettings.SpotifyClientId))
+            {
+                InterfaceUtils.TextCentered($"Due to Spotify API changes, you will need to configure a spotify client ID.");
+                InterfaceUtils.TextCentered($"Please open the settings to get instructions.");
+                if (InterfaceUtils.ButtonCentered("Open Settings"))
+                {
+                    configuration.ConfigShown = true;
+                }
+                return;
+            }
+            else if (_playerManager.ProvidersLoading)
             {
                 InterfaceUtils.TextCentered($"The music providers are still being loaded.");
                 return;

@@ -38,6 +38,17 @@ public class ConfigurationManager : IConfigurationManager, IHostedService
     {
         var pluginConfig = (Configuration)_pluginInterface.GetPluginConfig();
         Config = pluginConfig ?? new Configuration();
+        RunMigrations(Config);
+    }
+
+    private void RunMigrations(Configuration config)
+    {
+        if (config.Version == 0)
+        {
+            config.Version = 1;
+            config.SpotifySettings.TokenResponse = null;
+            config.PlayerSettings.DefaultProvider = "";
+        }
     }
 
     public void Save()

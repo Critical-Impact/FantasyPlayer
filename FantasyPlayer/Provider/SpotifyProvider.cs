@@ -28,10 +28,10 @@ namespace FantasyPlayer.Provider
             this.chatGui = chatGui;
         }
         public PlayerStateStruct PlayerState { get; set; }
-        
-        private SpotifyState _spotifyState;
+
+        private SpotifyState? _spotifyState;
         private string _lastId;
-        
+
         private CancellationTokenSource _startCts;
         private CancellationTokenSource _loginCts;
         private bool initialized;
@@ -44,7 +44,13 @@ namespace FantasyPlayer.Provider
                 RequiresLogin = true
             };
 
-            _spotifyState = new SpotifyState(Constants.SpotifyLoginUri, Constants.SpotifyClientId, Constants.SpotifyLoginPort, Constants.SpotifyPlayerRefreshTime);
+            if (string.IsNullOrEmpty(configuration.SpotifySettings.SpotifyClientId))
+            {
+                initialized = false;
+                return this;
+            }
+
+            _spotifyState = new SpotifyState(Constants.SpotifyLoginUri, configuration.SpotifySettings.SpotifyClientId, Constants.SpotifyLoginPort, Constants.SpotifyPlayerRefreshTime);
 
             _spotifyState.OnLoggedIn += OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate += OnPlayerStateUpdate;
@@ -80,7 +86,7 @@ namespace FantasyPlayer.Provider
             playerStateStruct.IsPlaying = currentlyPlaying.IsPlaying;
             playerStateStruct.RepeatState = currentlyPlaying.RepeatState;
             playerStateStruct.ShuffleState = currentlyPlaying.ShuffleState;
-            
+
             playerStateStruct.CurrentlyPlaying = new TrackStruct
             {
                 Id = playbackItem.Id,
@@ -92,7 +98,7 @@ namespace FantasyPlayer.Provider
                     Name = playbackItem.Album.Name
                 }
             };
-            
+
             PlayerState = playerStateStruct;
         }
 
@@ -104,7 +110,7 @@ namespace FantasyPlayer.Provider
 
             configuration.SpotifySettings.TokenResponse = tokenResponse;
 
-            if (_spotifyState.IsPremiumUser)
+            if (_spotifyState!.IsPremiumUser)
                 configuration.SpotifySettings.LimitedAccess = false;
 
             if (!_spotifyState.IsPremiumUser)
@@ -147,15 +153,18 @@ namespace FantasyPlayer.Provider
                 _loginCts.Dispose();
             }
 
-            _spotifyState.OnLoggedIn -= OnLoggedIn;
-            _spotifyState.OnPlayerStateUpdate -= OnPlayerStateUpdate;
-            _spotifyState.Dispose();
+            if (_spotifyState != null)
+            {
+                _spotifyState.OnLoggedIn -= OnLoggedIn;
+                _spotifyState.OnPlayerStateUpdate -= OnPlayerStateUpdate;
+                _spotifyState.Dispose();
+            }
         }
 
         public void StartAuth()
         {
             _loginCts = new CancellationTokenSource();
-            Task.Run(() => _spotifyState.StartAuth(_loginCts.Token), _loginCts.Token);
+            Task.Run(() => _spotifyState!.StartAuth(_loginCts.Token), _loginCts.Token);
             var playerStateStruct = PlayerState;
             playerStateStruct.IsAuthenticating = true;
             PlayerState = playerStateStruct;
@@ -163,36 +172,36 @@ namespace FantasyPlayer.Provider
 
         public void RetryAuth()
         {
-            _spotifyState.RetryLogin();
+            _spotifyState!.RetryLogin();
         }
 
         public void SwapRepeatState()
         {
-            if (_spotifyState.CurrentlyPlaying != null)
+            if (_spotifyState!.CurrentlyPlaying != null)
                 _spotifyState.SwapRepeatState();
         }
 
         public void SetPauseOrPlay(bool play)
         {
-            if (_spotifyState.CurrentlyPlaying != null)
+            if (_spotifyState!.CurrentlyPlaying != null)
                 _spotifyState.PauseOrPlay(play);
         }
 
         public void SetSkip(bool forward)
         {
-            if (_spotifyState.CurrentlyPlaying != null)
+            if (_spotifyState!.CurrentlyPlaying != null)
                 _spotifyState.Skip(forward);
         }
 
         public void SetShuffle(bool value)
         {
-            if (_spotifyState.CurrentlyPlaying != null)
+            if (_spotifyState!.CurrentlyPlaying != null)
                 _spotifyState.Shuffle(value);
         }
 
         public void SetVolume(int volume)
         {
-            if (_spotifyState.CurrentlyPlaying != null)
+            if (_spotifyState!.CurrentlyPlaying != null)
                 _spotifyState.SetVolume(volume);
         }
 

@@ -1,5 +1,9 @@
 ﻿using Dalamud.Bindings.ImGui;
 using System.Numerics;
+using AllaganLib.Shared.Extensions;
+using Dalamud.Interface;
+using Dalamud.Interface.Colors;
+using Dalamud.Interface.Utility.Raii;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using Microsoft.Extensions.Logging;
@@ -19,13 +23,21 @@ namespace FantasyPlayer.Interface.Window
         private readonly Configuration _configuration;
         private readonly ConfigurationManager _configurationManager;
         private readonly CommandManagerFp commandManagerFp;
+        private readonly IUiBuilder _uiBuilder;
 
-        public SettingsWindow(ILogger<SettingsWindow> logger, MediatorService mediatorService, Configuration configuration, ConfigurationManager configurationManager, CommandManagerFp commandManagerFp) : base(logger, mediatorService, "Fantasy Player - Configuration", ImGuiWindowFlags.NoScrollbar)
+        public SettingsWindow(ILogger<SettingsWindow> logger, MediatorService mediatorService, Configuration configuration, ConfigurationManager configurationManager, CommandManagerFp commandManagerFp, IUiBuilder uiBuilder) : base(logger, mediatorService, "Fantasy Player - Configuration", ImGuiWindowFlags.NoScrollbar)
         {
             _configuration = configuration;
             _configurationManager = configurationManager;
             this.commandManagerFp = commandManagerFp;
+            _uiBuilder = uiBuilder;
             MediatorService.Subscribe<ConfigurationUpdatedMessage>(this, ConfigurationUpdated );
+            this.Size = new Vector2(800, 800);
+            this.SizeCondition = ImGuiCond.FirstUseEver;
+            this.SizeConstraints = new WindowSizeConstraints()
+            {
+                MinimumSize = new Vector2(600, 400)
+            };
         }
 
         public override void OnClose()
@@ -66,8 +78,42 @@ namespace FantasyPlayer.Interface.Window
 
         }
 
+        public void HelpMarker(string helpText, FontAwesomeIcon icon, Vector4? color = null)
+        {
+            using var col = new ImRaii.Color();
+
+            if (color.HasValue)
+            {
+                col.Push(ImGuiCol.TextDisabled, color.Value);
+            }
+
+            ImGui.SameLine();
+
+            using (ImRaii.PushFont(_uiBuilder.FontIcon))
+            {
+                ImGui.TextDisabled(icon.ToIconString());
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                using (ImRaii.Tooltip())
+                {
+                    using (ImRaii.TextWrapPos(ImGui.GetFontSize() * 35.0f))
+                    {
+                        ImGui.Text(helpText);
+                    }
+                }
+            }
+        }
+
+        private string? spotifyClientId = null;
+
         private void MainWindow()
         {
+            ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+            ImGui.TextWrapped("Due to recent changes in how spotify provides access to it's API you will now need to provide your own client ID to continue to use Fantasy Player. Please see the Spotify Settings section for more details.");
+            ImGui.PopStyleColor();
+            ImGui.NewLine();
             ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
             ImGui.Text($"Type '{commandManagerFp.Command} help' to display chat commands!");
             ImGui.PopStyleColor();
@@ -84,6 +130,31 @@ namespace FantasyPlayer.Interface.Window
                         _configuration.PlayerSettings.ChatType,
                         type => { _configuration.PlayerSettings.ChatType = type; }))
                 {
+                }
+            }
+
+            if (ImGui.CollapsingHeader("Spotify Settings"))
+            {
+                if (this.spotifyClientId == null)
+                {
+                    this.spotifyClientId = _configuration.SpotifySettings.SpotifyClientId;
+                }
+                if (ImGui.InputText("Spotify Client ID",
+                        ref this.spotifyClientId))
+                {
+
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Save") && !string.IsNullOrEmpty(this.spotifyClientId))
+                {
+                    _configuration.SpotifySettings.SpotifyClientId = this.spotifyClientId;
+                }
+
+                if (ImGui.Button("Open Instructions"))
+                {
+                    "https://github.com/Critical-Impact/FantasyPlayer/blob/main/SETUP.md".OpenBrowser();
                 }
             }
 

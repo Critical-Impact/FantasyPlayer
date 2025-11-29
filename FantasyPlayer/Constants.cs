@@ -2,8 +2,7 @@
 {
     public static class Constants
     {
-        public const string SpotifyLoginUri = "http://localhost:2984/callback";
-        public const string SpotifyClientId = "543b99137134401580648c4ea2a55b08";
+        public const string SpotifyLoginUri = "http://127.0.0.1:2984/callback";
         public const int SpotifyPlayerRefreshTime = 3000;
         public const int SpotifyLoginPort = 2984;
     }

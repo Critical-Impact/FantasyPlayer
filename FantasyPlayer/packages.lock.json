@@ -2,23 +2,35 @@
   "version": 1,
   "dependencies": {
     "net9.0-windows7.0": {
+      "AllaganLib.Shared": {
+        "type": "Direct",
+        "requested": "[1.3.12, )",
+        "resolved": "1.3.12",
+        "contentHash": "iuWXu/YaN6It+DEW+6ASlwZunA2pE0I5W3qyIZpcfBrGvHVoOTsyPyosJBQExMWnvyrSIW+7myhzVxtLjOWRew==",
+        "dependencies": {
+          "Autofac": "8.4.0",
+          "Microsoft.Extensions.Hosting": "9.0.8",
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.8",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.8"
+        }
+      },
       "Autofac": {
         "type": "Direct",
-        "requested": "[8.4.0, )",
-        "resolved": "8.4.0",
-        "contentHash": "XMWHyO6fXTv8rwCfhm6+64mQS6CyL0rve/hWSODsUrVuEGtq1fjxSOlVTBqCRsW6L8K3OQDskJaPB1boVMI2eQ==",
+        "requested": "[9.0.0, )",
+        "resolved": "9.0.0",
+        "contentHash": "G8TpUMVIq1pEAMuAao8h5MKduY91SotjgK93wQb5LaxbJUVE0/XjCA6t2SOp+AkPC3GB/C2MAiF2D7krYjraFw==",
         "dependencies": {
-          "System.Diagnostics.DiagnosticSource": "8.0.1"
+          "System.Diagnostics.DiagnosticSource": "10.0.0"
         }
       },
       "DalaMock.Host": {
         "type": "Direct",
-        "requested": "[3.0.1, )",
-        "resolved": "3.0.1",
-        "contentHash": "g6pTJdUyVpkPNJW7nJXXHP6CZv3Rojb4CaI63KULb28o/cGUw5czkV+BLBI7VvQiMF86ZDgXG0EDm/pUz8tPGQ==",
+        "requested": "[3.0.11, )",
+        "resolved": "3.0.11",
+        "contentHash": "6pnB8tF7NxXYE4jYPew5ZQuxoBvsXxnuzJyDG3N1qiGQ6erE4evqABH4uwA55LjcSQc/VrTG/v21aAmgNt7tXA==",
         "dependencies": {
           "Autofac.Extensions.DependencyInjection": "10.0.0",
-          "DalaMock.Shared": "3.0.1",
+          "DalaMock.Shared": "3.0.11",
           "Microsoft.Extensions.Hosting": "9.0.8",
           "Microsoft.Extensions.Hosting.Abstractions": "9.0.8",
           "Microsoft.Extensions.ObjectPool": "9.0.8"
@@ -26,9 +38,9 @@
       },
       "DalaMock.Shared": {
         "type": "Direct",
-        "requested": "[3.0.1, )",
-        "resolved": "3.0.1",
-        "contentHash": "EfoaBYfKXg3hL9JlfH4Kml4TD8NypA/RY7Pvm2/sQciSHHlhJRp3EulAF43qd7QgxN2g5QQeseqCWflmKI6YMw==",
+        "requested": "[3.0.11, )",
+        "resolved": "3.0.11",
+        "contentHash": "GHkV6zMW8yr8Xgx6XQgQpKbI00/xSxvAInkTmE/ylsVl2lFyRDJs9e1I3aNt0krvKIVJbU2BhtJvFnfleM6Yqw==",
         "dependencies": {
           "Autofac": "8.4.0",
           "Microsoft.Extensions.Hosting": "9.0.8",
@@ -37,9 +49,9 @@
       },
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[13.0.0, )",
-        "resolved": "13.0.0",
-        "contentHash": "Mb3cUDSK/vDPQ8gQIeuCw03EMYrej1B4J44a1AvIJ9C759p9XeqdU9Hg4WgOmlnlPe0G7ILTD32PKSUpkQNa8w=="
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "XdoNhJGyFby5M/sdcRhnc5xTop9PHy+H50PTWpzLhJugjB19EDBiHD/AsiDF66RETM+0qKUdJBZrNuebn7qswQ=="
       },
       "DotNet.ReproducibleBuilds": {
         "type": "Direct",
@@ -377,8 +389,8 @@
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "vaoWjvkG1aenR2XdjaVivlCV9fADfgyhW5bZtXT23qaEea0lWiUljdQuze4E31vKM7ZWJaSUsbYIKE3rnzfZUg=="
+        "resolved": "10.0.0",
+        "contentHash": "0KdBK+h7G13PuOSC2R/DalAoFMvdYMznvGRuICtkdcUMXgl/gYXsG6z4yUvTxHSMACorWgHCU1Faq0KUHU6yAQ=="
       },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
