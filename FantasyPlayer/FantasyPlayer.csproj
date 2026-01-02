@@ -41,4 +41,7 @@
     <ItemGroup>
         <Folder Include="images"/>
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="CHANGELOG.md" />
+    </ItemGroup>
 </Project>
