@@ -132,6 +132,16 @@ namespace FantasyPlayer.Provider
 
         public void Update()
         {
+            if (_spotifyState?.CurrentlyPlaying != null)
+            {
+                var progressMs = _spotifyState.CurrentlyPlaying.ProgressMs;
+                if (PlayerState.ProgressMs != progressMs)
+                {
+                    var playerStateStruct = PlayerState;
+                    playerStateStruct.ProgressMs = progressMs;
+                    PlayerState = playerStateStruct;
+                }
+            }
         }
 
         public void ReAuth()

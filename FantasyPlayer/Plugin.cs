@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
+using FantasyPlayer.Lyrics;
 using FantasyPlayer.Manager;
 
 namespace FantasyPlayer
@@ -21,8 +22,11 @@ namespace FantasyPlayer
 
     public class Plugin : HostedPlugin
     {
-        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
+        private readonly IFlyTextGui _flyTextGui;
+
+        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition, IFlyTextGui flyTextGui) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
         {
+            _flyTextGui = flyTextGui;
             CreateHost();
             Start();
         }
@@ -37,6 +41,7 @@ namespace FantasyPlayer
 
         public override void ConfigureContainer(ContainerBuilder containerBuilder)
         {
+            containerBuilder.RegisterInstance(_flyTextGui).As<IFlyTextGui>().SingleInstance();
             containerBuilder.RegisterType<ConfigurationManager>().SingleInstance();
             containerBuilder.Register(provider =>
             {
@@ -54,6 +59,8 @@ namespace FantasyPlayer
             containerBuilder.RegisterType<PlayerWindow>().As<Window>().SingleInstance();
             containerBuilder.RegisterType<DebugWindow>().As<Window>().SingleInstance();
             containerBuilder.RegisterType<CommandsService>().SingleInstance();
+            containerBuilder.RegisterType<LyricsService>().SingleInstance();
+            containerBuilder.RegisterType<LyricsManager>().SingleInstance();
             containerBuilder.RegisterType<Font>().As<IFont>().SingleInstance();
             containerBuilder.RegisterType<SpotifyProvider>().As<IPlayerProvider>().SingleInstance();
         }
@@ -65,6 +72,7 @@ namespace FantasyPlayer
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandManagerFp>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<PlayerManager>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandsService>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<LyricsManager>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<MediatorService>());
         }
     }
