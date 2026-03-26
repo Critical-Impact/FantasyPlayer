@@ -11,7 +11,7 @@ using Dalamud.Plugin.Services;
 
 public class MockPlugin : Plugin
 {
-    public MockPlugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
+public MockPlugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
     {
     }
 
