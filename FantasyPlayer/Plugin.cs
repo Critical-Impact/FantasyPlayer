@@ -21,7 +21,7 @@ namespace FantasyPlayer
 
     public class Plugin : HostedPlugin
     {
-        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
+        public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
         {
             CreateHost();
             Start();

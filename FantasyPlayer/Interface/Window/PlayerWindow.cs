@@ -30,9 +30,8 @@ namespace FantasyPlayer.Interface.Window
         private readonly IFont font;
         private readonly PlayerManager _playerManager;
         private readonly Configuration configuration;
-        private readonly ConfigurationManager _configurationManager;
         private readonly ICondition condition;
-        private readonly IClientState clientState;
+        private readonly IPlayerState _playerState;
 
         private DateTime? _lastUpdated;
         private DateTime? _lastPaused;
@@ -51,15 +50,14 @@ namespace FantasyPlayer.Interface.Window
             39 * ImGui.GetIO().FontGlobalScale);
 
 
-        public PlayerWindow(ILogger<PlayerWindow> logger, IUiBuilder uiBuilder, IFont font, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, ConfigurationManager configurationManager, ICondition condition, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Player")
+        public PlayerWindow(ILogger<PlayerWindow> logger, IUiBuilder uiBuilder, IFont font, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, ICondition condition, IPlayerState playerState) : base(logger, mediatorService, "Fantasy Player - Player")
         {
             this.uiBuilder = uiBuilder;
             this.font = font;
             _playerManager = playerManager;
             this.configuration = configuration;
-            _configurationManager = configurationManager;
             this.condition = condition;
-            this.clientState = clientState;
+            _playerState = playerState;
             SetDefaultWindowSize();
             MediatorService.Subscribe<ConfigurationUpdatedMessage>(this, ConfigurationUpdated );
             this.uiBuilder.OpenMainUi += UiBuilderOnOpenMainUi;
@@ -108,7 +106,7 @@ namespace FantasyPlayer.Interface.Window
         public override bool DrawConditions()
         {
             if (configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-                clientState.LocalContentId == 0)
+                _playerState.ContentId == 0)
             {
                 return false;
             }
@@ -119,7 +117,7 @@ namespace FantasyPlayer.Interface.Window
         public override void Draw()
         {
             if (configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-                clientState.LocalContentId == 0)
+                _playerState.ContentId == 0)
             {
             }
             else if (_playerManager.CurrentPlayerProvider == null &&

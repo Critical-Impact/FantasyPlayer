@@ -8,6 +8,11 @@ Instead the changelog reader and automation surrounding plugin PRs will add the 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.html).
 
+## [6.0.0] - 2026-05-02
+
+### Changed
+- API15 update
+
 ## [5.0.0] - 2025-22-12
 
 ### Fixed

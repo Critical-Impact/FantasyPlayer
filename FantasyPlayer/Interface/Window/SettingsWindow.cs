@@ -78,34 +78,6 @@ namespace FantasyPlayer.Interface.Window
 
         }
 
-        public void HelpMarker(string helpText, FontAwesomeIcon icon, Vector4? color = null)
-        {
-            using var col = new ImRaii.Color();
-
-            if (color.HasValue)
-            {
-                col.Push(ImGuiCol.TextDisabled, color.Value);
-            }
-
-            ImGui.SameLine();
-
-            using (ImRaii.PushFont(_uiBuilder.FontIcon))
-            {
-                ImGui.TextDisabled(icon.ToIconString());
-            }
-
-            if (ImGui.IsItemHovered())
-            {
-                using (ImRaii.Tooltip())
-                {
-                    using (ImRaii.TextWrapPos(ImGui.GetFontSize() * 35.0f))
-                    {
-                        ImGui.Text(helpText);
-                    }
-                }
-            }
-        }
-
         private string? spotifyClientId = null;
 
         private void MainWindow()

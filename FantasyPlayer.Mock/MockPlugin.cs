@@ -1,3 +1,5 @@
+using Dalamud.Interface.Windowing;
+
 namespace FantasyPlayer.Mock;
 
 using Autofac;
@@ -9,7 +11,7 @@ using Dalamud.Plugin.Services;
 
 public class MockPlugin : Plugin
 {
-    public MockPlugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
+    public MockPlugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
     {
     }
 

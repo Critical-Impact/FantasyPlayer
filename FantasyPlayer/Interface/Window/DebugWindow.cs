@@ -16,13 +16,13 @@ public class DebugWindow : UpdatingWindow
 {
     private readonly PlayerManager playerManager;
     private readonly Configuration configuration;
-    private readonly IClientState clientState;
+    private readonly IPlayerState _playerState;
 
-    public DebugWindow(ILogger<DebugWindow> logger, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, IClientState clientState) : base(logger, mediatorService, "Fantasy Player - Debug")
+    public DebugWindow(ILogger<DebugWindow> logger, MediatorService mediatorService, PlayerManager playerManager, Configuration configuration, IPlayerState playerState) : base(logger, mediatorService, "Fantasy Player - Debug")
     {
         this.playerManager = playerManager;
         this.configuration = configuration;
-        this.clientState = clientState;
+        _playerState = playerState;
         MediatorService.Subscribe<ConfigurationUpdatedMessage>(this, ConfigurationUpdated );
     }
 
@@ -55,7 +55,7 @@ public class DebugWindow : UpdatingWindow
     public override bool DrawConditions()
     {
         if (configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-            clientState.LocalContentId == 0)
+            _playerState.ContentId == 0)
         {
             return false;
         }
