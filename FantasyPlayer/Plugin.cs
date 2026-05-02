@@ -1,5 +1,4 @@
 ﻿using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
@@ -22,11 +21,8 @@ namespace FantasyPlayer
 
     public class Plugin : HostedPlugin
     {
-        private readonly IFlyTextGui _flyTextGui;
-
-        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition, IFlyTextGui flyTextGui) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
+        public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
         {
-            _flyTextGui = flyTextGui;
             CreateHost();
             Start();
         }
@@ -41,7 +37,6 @@ namespace FantasyPlayer
 
         public override void ConfigureContainer(ContainerBuilder containerBuilder)
         {
-            containerBuilder.RegisterInstance(_flyTextGui).As<IFlyTextGui>().SingleInstance();
             containerBuilder.RegisterType<ConfigurationManager>().SingleInstance();
             containerBuilder.Register(provider =>
             {

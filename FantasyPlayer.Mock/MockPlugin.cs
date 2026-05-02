@@ -5,18 +5,17 @@ using DalaMock.Core.Mocks;
 using DalaMock.Core.Windows;
 using DalaMock.Shared.Interfaces;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 
 public class MockPlugin : Plugin
 {
-    public MockPlugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition, IFlyTextGui flyTextGui) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition, flyTextGui)
+    public MockPlugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
     {
     }
 
     public override void ConfigureContainer(ContainerBuilder containerBuilder)
     {
         base.ConfigureContainer(containerBuilder);
-        containerBuilder.RegisterType<MockWindowSystem>().As<IWindowSystem>();
+        containerBuilder.RegisterType<MockWindowSystem>().SingleInstance();
         containerBuilder.RegisterType<MockFont>().As<IFont>();
     }
 }
