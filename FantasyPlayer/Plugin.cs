@@ -22,8 +22,11 @@ namespace FantasyPlayer
 
     public class Plugin : HostedPlugin
     {
-public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
+        private readonly IFlyTextGui _flyTextGui;
+
+        public Plugin(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog, IFramework framework, IClientState clientState, IChatGui chatGui, ICommandManager commandManager, ICondition condition, IFlyTextGui flyTextGui) : base(pluginInterface, pluginLog, framework, clientState, chatGui, commandManager, condition)
         {
+            _flyTextGui = flyTextGui;
             CreateHost();
             Start();
         }
@@ -38,6 +41,7 @@ public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
 
         public override void ConfigureContainer(ContainerBuilder containerBuilder)
         {
+            containerBuilder.RegisterInstance(_flyTextGui).As<IFlyTextGui>().SingleInstance();
             containerBuilder.RegisterType<ConfigurationManager>().SingleInstance();
             containerBuilder.Register(provider =>
             {
