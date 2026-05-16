@@ -23,8 +23,8 @@ namespace FantasyPlayer.Interface
         private readonly SettingsWindow settingsWindow;
         private readonly IFramework framework;
         private IWindowSystem windowSystem;
-        
-        public InterfaceController(IUiBuilder uiBuilder, IEnumerable<Dalamud.Interface.Windowing.Window> windows, IFramework framework, WindowSystemFactory windowSystemFactory)
+
+        public InterfaceController(IUiBuilder uiBuilder, IEnumerable<Dalamud.Interface.Windowing.Window> windows, IFramework framework, IWindowSystemFactory windowSystemFactory)
         {
             this.uiBuilder = uiBuilder;
             this.framework = framework;

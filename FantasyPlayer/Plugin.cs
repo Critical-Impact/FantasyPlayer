@@ -3,6 +3,7 @@ using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Lyrics;
+using FantasyPlayer.Ipc;
 using FantasyPlayer.Manager;
 
 namespace FantasyPlayer
@@ -23,8 +24,6 @@ namespace FantasyPlayer
     {
         public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
         {
-            CreateHost();
-            Start();
         }
 
         public override HostedPluginOptions ConfigureOptions()
@@ -58,6 +57,7 @@ namespace FantasyPlayer
             containerBuilder.RegisterType<LyricsManager>().SingleInstance();
             containerBuilder.RegisterType<Font>().As<IFont>().SingleInstance();
             containerBuilder.RegisterType<SpotifyProvider>().As<IPlayerProvider>().SingleInstance();
+            containerBuilder.RegisterType<IpcService>().SingleInstance();
         }
 
         public override void ConfigureServices(IServiceCollection serviceCollection)
@@ -69,6 +69,7 @@ namespace FantasyPlayer
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandsService>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<LyricsManager>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<MediatorService>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<IpcService>());
         }
     }
 }
