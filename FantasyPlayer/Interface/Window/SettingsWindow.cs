@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using System;
 using System.Numerics;
 using AllaganLib.Shared.Extensions;
 using Dalamud.Interface;
@@ -262,7 +263,59 @@ namespace FantasyPlayer.Interface.Window
                 }
             }
 
+            if (ImGui.CollapsingHeader("Lyrics Settings"))
+            {
+                var enableLyrics = _configuration.LyricsSettings.EnableLyrics;
+                if (ImGui.Checkbox("Enable Lyrics", ref enableLyrics))
+                {
+                    _configuration.LyricsSettings.EnableLyrics = enableLyrics;
+                }
+
+                var displayModeIndex = (int)_configuration.LyricsSettings.DisplayMode;
+                string[] displayModes = { "Chat", "Flytext" };
+                if (ImGui.Combo("Lyric Display Mode", ref displayModeIndex, displayModes, displayModes.Length))
+                {
+                    _configuration.LyricsSettings.DisplayMode = (Config.LyricDisplayMode)displayModeIndex;
+                }
+
+                if (_configuration.LyricsSettings.DisplayMode == Config.LyricDisplayMode.Chat)
+                {
+                    if (Widget.DrawChatTypeSelector("Lyrics chat output channel",
+                            "To which chat channel should the lyrics be printed?",
+                            _configuration.LyricsSettings.ChatType,
+                            type => { _configuration.LyricsSettings.ChatType = type; }))
+                    {
+                    }
+                }
+                else
+                {
+                    var lyricColor = AbgrToVector4(_configuration.LyricsSettings.FlyTextColor);
+                    if (ImGui.ColorEdit4("Flytext Color", ref lyricColor))
+                    {
+                        _configuration.LyricsSettings.FlyTextColor = Vector4ToAbgr(lyricColor);
+                    }
+                }
+            }
+
             ImGui.Separator();
+        }
+
+        private static Vector4 AbgrToVector4(uint abgr)
+        {
+            var r = (abgr & 0xFF) / 255f;
+            var g = ((abgr >> 8) & 0xFF) / 255f;
+            var b = ((abgr >> 16) & 0xFF) / 255f;
+            var a = ((abgr >> 24) & 0xFF) / 255f;
+            return new Vector4(r, g, b, a);
+        }
+
+        private static uint Vector4ToAbgr(Vector4 color)
+        {
+            var r = (uint)Math.Clamp(color.X * 255f, 0f, 255f);
+            var g = (uint)Math.Clamp(color.Y * 255f, 0f, 255f);
+            var b = (uint)Math.Clamp(color.Z * 255f, 0f, 255f);
+            var a = (uint)Math.Clamp(color.W * 255f, 0f, 255f);
+            return (a << 24) | (b << 16) | (g << 8) | r;
         }
     }
 }

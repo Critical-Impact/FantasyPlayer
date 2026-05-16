@@ -1,8 +1,8 @@
 ﻿using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
+using FantasyPlayer.Lyrics;
 using FantasyPlayer.Ipc;
 using FantasyPlayer.Manager;
 
@@ -53,6 +53,8 @@ namespace FantasyPlayer
             containerBuilder.RegisterType<PlayerWindow>().As<Window>().SingleInstance();
             containerBuilder.RegisterType<DebugWindow>().As<Window>().SingleInstance();
             containerBuilder.RegisterType<CommandsService>().SingleInstance();
+            containerBuilder.RegisterType<LyricsService>().SingleInstance();
+            containerBuilder.RegisterType<LyricsManager>().SingleInstance();
             containerBuilder.RegisterType<Font>().As<IFont>().SingleInstance();
             containerBuilder.RegisterType<SpotifyProvider>().As<IPlayerProvider>().SingleInstance();
             containerBuilder.RegisterType<IpcService>().SingleInstance();
@@ -65,6 +67,7 @@ namespace FantasyPlayer
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandManagerFp>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<PlayerManager>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandsService>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<LyricsManager>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<MediatorService>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<IpcService>());
         }
