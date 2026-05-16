@@ -24,8 +24,6 @@ namespace FantasyPlayer
     {
         public Plugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
         {
-            CreateHost();
-            Start();
         }
 
         public override HostedPluginOptions ConfigureOptions()

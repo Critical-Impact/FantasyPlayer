@@ -1,10 +1,9 @@
 ﻿using System.IO;
+using DalaMock.Core.Configuration;
+using DalaMock.Core.Plugin;
 
 namespace FantasyPlayer.Mock
 {
-    using DalaMock.Core.DI;
-    using DalaMock.Core.Mocks;
-
     class Program
     {
         static void Main(string[] args)

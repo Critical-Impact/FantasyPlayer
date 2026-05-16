@@ -8,6 +8,14 @@ Instead the changelog reader and automation surrounding plugin PRs will add the 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.html).
 
+## [6.0.1] - 2026-05-02
+
+### Added
+- Added IPC allowing other plugins to control Fantasy Player which in turn controls spotify
+
+### Changed
+- Bump deps
+
 ## [6.0.0] - 2026-05-02
 
 ### Changed

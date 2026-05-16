@@ -11,14 +11,10 @@ using Dalamud.Plugin.Services;
 
 public class MockPlugin : Plugin
 {
-    public MockPlugin(IDalamudPluginInterface pluginInterface) : base(pluginInterface)
+    public MockPlugin(MockReplacementContainer replacementContainer, IDalamudPluginInterface pluginInterface) : base(pluginInterface)
     {
+        ReplacementContainer = replacementContainer;
     }
 
-    public override void ConfigureContainer(ContainerBuilder containerBuilder)
-    {
-        base.ConfigureContainer(containerBuilder);
-        containerBuilder.RegisterType<MockWindowSystem>().As<IWindowSystem>();
-        containerBuilder.RegisterType<MockFont>().As<IFont>();
-    }
+    public override IReplacementContainer ReplacementContainer { get; }
 }
