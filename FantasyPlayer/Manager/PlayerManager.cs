@@ -15,6 +15,7 @@ namespace FantasyPlayer.Manager
 {
     using System.Threading;
     using Config;
+    using Dalamud.Game.Config;
     using Dalamud.Plugin.Services;
     using Microsoft.Extensions.Hosting;
 
@@ -23,7 +24,10 @@ namespace FantasyPlayer.Manager
         private readonly IPluginLog pluginLog;
         private readonly Configuration configuration;
         private readonly IFramework framework;
+        private readonly IGameConfig gameConfig;
 
+        private bool _wasPlaying = false;
+        private uint _savedBgmVolume = 100;
         public IPlayerProvider? CurrentPlayerProvider;
 
         public bool ProvidersLoading
@@ -36,12 +40,14 @@ namespace FantasyPlayer.Manager
 
         public List<IPlayerProvider> PlayerProviders { get; }
 
-        public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, IFramework framework)
+        public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, 
+            IFramework framework, IGameConfig gameConfig, ICommandManager command)
         {
             this.pluginLog = pluginLog;
             this.configuration = configuration;
             this.PlayerProviders = playerProviders.ToList();
             this.framework = framework;
+            this.gameConfig = gameConfig;
             SetupDefaultProvider();
         }
 
@@ -64,6 +70,17 @@ namespace FantasyPlayer.Manager
         {
             foreach (var playerProvider in PlayerProviders)
                 playerProvider.Update();
+            var isPlaying = CurrentPlayerProvider != null && CurrentPlayerProvider.PlayerState.IsPlaying;
+
+            if (isPlaying && !_wasPlaying)
+            {
+                gameConfig.TryGet(SystemConfigOption.SoundBgm, out _savedBgmVolume);
+                gameConfig.Set(SystemConfigOption.SoundBgm, 0u);
+            }
+            else if (!isPlaying && _wasPlaying)
+            {
+                gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
+            }
         }
 
         public override async Task StartAsync(CancellationToken cancellationToken)
