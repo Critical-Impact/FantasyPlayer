@@ -15,9 +15,10 @@ namespace FantasyPlayer.Manager
 {
     using System.Threading;
     using Config;
-    using Dalamud.Game.Config;
     using Dalamud.Plugin.Services;
     using Microsoft.Extensions.Hosting;
+    using Dalamud.Game.Config;
+
 
     public class PlayerManager : BackgroundService
     {
@@ -92,6 +93,9 @@ namespace FantasyPlayer.Manager
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             this.framework.Update -= Update;
+
+            if(_wasPlaying)
+                gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
             await base.StopAsync(cancellationToken);
         }
 
