@@ -42,7 +42,7 @@ namespace FantasyPlayer.Manager
         public List<IPlayerProvider> PlayerProviders { get; }
 
         public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, 
-            IFramework framework, IGameConfig gameConfig, ICommandManager command)
+            IFramework framework, IGameConfig gameConfig)
         {
             this.pluginLog = pluginLog;
             this.configuration = configuration;
@@ -71,6 +71,16 @@ namespace FantasyPlayer.Manager
         {
             foreach (var playerProvider in PlayerProviders)
                 playerProvider.Update();
+            if (!configuration.PlayerSettings.MuteBgmOnPlayback)
+            {
+                if (_wasPlaying)
+                {
+                    gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
+                    _wasPlaying = false;
+                }
+                return;
+            }
+
             var isPlaying = CurrentPlayerProvider != null && CurrentPlayerProvider.PlayerState.IsPlaying;
 
             if (isPlaying && !_wasPlaying)
@@ -95,7 +105,7 @@ namespace FantasyPlayer.Manager
         {
             this.framework.Update -= Update;
 
-            if(_wasPlaying)
+            if (_wasPlaying)
                 gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
             await base.StopAsync(cancellationToken);
         }

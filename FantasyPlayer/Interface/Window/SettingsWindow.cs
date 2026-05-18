@@ -163,6 +163,14 @@ namespace FantasyPlayer.Interface.Window
 
                 ImGui.Separator();
 
+                var muteBgmOnPlayback = _configuration.PlayerSettings.MuteBgmOnPlayback;
+                if (ImGui.Checkbox("Mute BGM when playing", ref muteBgmOnPlayback))
+                {
+                    _configuration.PlayerSettings.MuteBgmOnPlayback = muteBgmOnPlayback;
+                }
+
+                ImGui.Separator();
+
                 if (!_configuration.SpotifySettings.LimitedAccess)
                 {
                     var compactPlayer = _configuration.PlayerSettings.CompactPlayer;
