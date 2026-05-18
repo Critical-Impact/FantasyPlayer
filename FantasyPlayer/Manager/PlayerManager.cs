@@ -82,6 +82,7 @@ namespace FantasyPlayer.Manager
             {
                 gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
             }
+            _wasPlaying = isPlaying;
         }
 
         public override async Task StartAsync(CancellationToken cancellationToken)
