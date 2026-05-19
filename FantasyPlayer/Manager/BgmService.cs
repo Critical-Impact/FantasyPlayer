@@ -59,10 +59,12 @@
                 {
                     gameConfig.TryGet(SystemConfigOption.SoundBgm, out _savedBgmVolume);
                     gameConfig.Set(SystemConfigOption.SoundBgm, 0u);
+                    _isMuted = true;
                 }
                 else
                 {
                     gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
+                    _isMuted = false;
                 }
                 _isMuted = isPlaying;
             });
