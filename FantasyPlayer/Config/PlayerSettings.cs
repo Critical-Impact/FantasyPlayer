@@ -126,6 +126,12 @@ namespace FantasyPlayer.Config
             set => SetField(ref chatType, value);
         }
 
+        private bool muteBgmOnPlayback = true;
+        public bool MuteBgmOnPlayback
+        {
+            get => muteBgmOnPlayback;
+            set => SetField(ref muteBgmOnPlayback, value);
+        }
         public PlayerSettings()
         {
             

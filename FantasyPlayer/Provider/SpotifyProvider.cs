@@ -12,6 +12,7 @@ namespace FantasyPlayer.Provider
     using Config;
     using Dalamud.Plugin.Services;
     using Manager;
+    using System;
 
     public class SpotifyProvider : IPlayerProvider
     {
@@ -98,8 +99,10 @@ namespace FantasyPlayer.Provider
                     Name = playbackItem.Album.Name
                 }
             };
-
+            bool wasPlaying = PlayerState.IsPlaying;
             PlayerState = playerStateStruct;
+            if(wasPlaying != PlayerState.IsPlaying)
+                PlaybackStateChanged?.Invoke(PlayerState.IsPlaying);
         }
 
         private void OnLoggedIn(PrivateUser privateUser, PKCETokenResponse tokenResponse)
@@ -214,5 +217,6 @@ namespace FantasyPlayer.Provider
         {
             return Task.CompletedTask;
         }
+        public event Action<bool>? PlaybackStateChanged; 
     }
 }

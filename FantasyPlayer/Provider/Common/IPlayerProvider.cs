@@ -24,5 +24,7 @@ namespace FantasyPlayer.Provider.Common
         public void SetSkip(bool forward);
         public void SetShuffle(bool value);
         public void SetVolume(int volume);
+
+        event Action<bool>? PlaybackStateChanged;
     }
 }

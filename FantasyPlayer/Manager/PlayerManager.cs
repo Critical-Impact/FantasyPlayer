@@ -17,13 +17,14 @@ namespace FantasyPlayer.Manager
     using Config;
     using Dalamud.Plugin.Services;
     using Microsoft.Extensions.Hosting;
+    using Dalamud.Game.Config;
+
 
     public class PlayerManager : BackgroundService
     {
         private readonly IPluginLog pluginLog;
         private readonly Configuration configuration;
         private readonly IFramework framework;
-
         public IPlayerProvider? CurrentPlayerProvider;
 
         public bool ProvidersLoading
@@ -36,7 +37,8 @@ namespace FantasyPlayer.Manager
 
         public List<IPlayerProvider> PlayerProviders { get; }
 
-        public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, IFramework framework)
+        public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, 
+            IFramework framework)
         {
             this.pluginLog = pluginLog;
             this.configuration = configuration;
@@ -75,6 +77,7 @@ namespace FantasyPlayer.Manager
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             this.framework.Update -= Update;
+
             await base.StopAsync(cancellationToken);
         }
 
