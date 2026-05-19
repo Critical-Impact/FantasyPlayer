@@ -56,6 +56,7 @@ namespace FantasyPlayer
             containerBuilder.RegisterType<Font>().As<IFont>().SingleInstance();
             containerBuilder.RegisterType<SpotifyProvider>().As<IPlayerProvider>().SingleInstance();
             containerBuilder.RegisterType<IpcService>().SingleInstance();
+            containerBuilder.RegisterType<BgmService>().SingleInstance();
         }
 
         public override void ConfigureServices(IServiceCollection serviceCollection)
@@ -67,6 +68,7 @@ namespace FantasyPlayer
             serviceCollection.AddHostedService(p => p.GetRequiredService<CommandsService>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<MediatorService>());
             serviceCollection.AddHostedService(p => p.GetRequiredService<IpcService>());
+            serviceCollection.AddHostedService(p => p.GetRequiredService<BgmService>());
         }
     }
 }

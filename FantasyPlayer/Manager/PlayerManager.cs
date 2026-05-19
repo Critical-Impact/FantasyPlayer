@@ -25,10 +25,6 @@ namespace FantasyPlayer.Manager
         private readonly IPluginLog pluginLog;
         private readonly Configuration configuration;
         private readonly IFramework framework;
-        private readonly IGameConfig gameConfig;
-
-        private bool _wasPlaying = false;
-        private uint _savedBgmVolume = 100;
         public IPlayerProvider? CurrentPlayerProvider;
 
         public bool ProvidersLoading
@@ -42,13 +38,12 @@ namespace FantasyPlayer.Manager
         public List<IPlayerProvider> PlayerProviders { get; }
 
         public PlayerManager(IPluginLog pluginLog, Configuration configuration, IEnumerable<IPlayerProvider> playerProviders, 
-            IFramework framework, IGameConfig gameConfig)
+            IFramework framework)
         {
             this.pluginLog = pluginLog;
             this.configuration = configuration;
             this.PlayerProviders = playerProviders.ToList();
             this.framework = framework;
-            this.gameConfig = gameConfig;
             SetupDefaultProvider();
         }
 
@@ -71,28 +66,6 @@ namespace FantasyPlayer.Manager
         {
             foreach (var playerProvider in PlayerProviders)
                 playerProvider.Update();
-            if (!configuration.PlayerSettings.MuteBgmOnPlayback)
-            {
-                if (_wasPlaying)
-                {
-                    gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
-                    _wasPlaying = false;
-                }
-                return;
-            }
-
-            var isPlaying = CurrentPlayerProvider != null && CurrentPlayerProvider.PlayerState.IsPlaying;
-
-            if (isPlaying && !_wasPlaying)
-            {
-                gameConfig.TryGet(SystemConfigOption.SoundBgm, out _savedBgmVolume);
-                gameConfig.Set(SystemConfigOption.SoundBgm, 0u);
-            }
-            else if (!isPlaying && _wasPlaying)
-            {
-                gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
-            }
-            _wasPlaying = isPlaying;
         }
 
         public override async Task StartAsync(CancellationToken cancellationToken)
@@ -105,8 +78,6 @@ namespace FantasyPlayer.Manager
         {
             this.framework.Update -= Update;
 
-            if (_wasPlaying)
-                gameConfig.Set(SystemConfigOption.SoundBgm, _savedBgmVolume);
             await base.StopAsync(cancellationToken);
         }
 
